@@ -1,5 +1,5 @@
 <!-- 
-  2022-02-21(화) <dialog> 이해하기 with tailwindcss 
+  2022-02-21(화) <dialog> 이해하기
   1. dialog 태그 사용해보기
   2. backdrop 클릭시 dialog close
 -->
@@ -100,6 +100,7 @@
 </body>
 
 <script>
+  /** @type {HTMLButtonElement} */
   const showBtn = document.querySelector('.show-btn');
   /** @type {HTMLDialogElement} */
   const dialogOne = document.querySelector('#dialog-1');
@@ -111,7 +112,11 @@
   })
 
   dialogOne.addEventListener('close', (event) => {
-    // event.returnValue는 close이벤트에 대한 리턴 값으로 true를 반환한다.
+    /**
+     * event.returnValue는 close이벤트에 대한 리턴 값으로 true를 반환한다.
+     * 따라서 event가 아닌 dialogOne 요소의 returnValue의 값을 확인한다.
+     * dialogOne.returnValue의 값은 form 요소의 자식인 button 요소의 value 값이다.
+     * */
     if (dialogOne.returnValue === 'confirm') {
       dialogTwo.showModal();
     }
