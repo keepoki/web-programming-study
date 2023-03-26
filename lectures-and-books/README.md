@@ -1,3 +1,3 @@
-# 강의와 책에 대한 학습 내용을 기록 합니다
+# 강의와 책 학습 기록
 
 - [Let's Get It 자바스크립트 프로그래밍](/lectures-and-books/lets-get-it-javascript-programming)
