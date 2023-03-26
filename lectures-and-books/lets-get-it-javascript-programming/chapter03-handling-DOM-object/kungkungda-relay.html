@@ -1,0 +1,143 @@
+<html lang="kr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿵쿵따 게임</title>
+</head>
+
+<body>
+  <h1 style="text-align: center;">쿵쿵따 게임</h1>
+  <div id="view" style="display: flex; flex-direction: column; align-items: center; visibility: hidden;">
+    <h2>쿵쿵따 게임에 오신것을 환영합니다.</h2>
+    <h4 style="width:40%; min-width: 300px;">
+      쿵쿵따는 세 글자만 입력이 가능하며, 제시어의 마지막 글자가 입력할 단어의 첫 번째 글자가 됩니다. 즐거운 게임이 되시길 바랍니다.
+    </h4>
+    <h3>참가자는 총 <span id="number" style="color:chocolate;">?</span>명 입니다.</h3>
+    <h3><span id="order" style="color:darkcyan">1</span>번 참가자의 차례입니다.</h3>
+    <p>이번 제시어는 <span id="word" style="font-weight: bold; color: tomato;">○○○</span> 입니다.</p>
+    <div>
+      <input id="input" type="text">
+      <button id="push-btn">입력</button>
+    </div>
+    <p>쿵쿵따리 쿵쿵따~ 쿵쿵따리 쿵쿵따~ 쿵! 쿵! 쿵! 쿵!</p>
+    <p id="word-chain" style="max-width: 70%;"></p>
+  </div>
+
+  <script>
+    // 시작
+    // 몇 명이 참가하는지 입력 받는다
+    const number = Number(window.prompt('몇 명이 참가하나요?'));
+    /**
+     * 미션 2. 초반에 prompt 함수를 사용해 몇 명이 참가할지를 선택할 때 
+     * 사용자가 취소를 누르면 다음 코드가 실행되지 않게 처리하라.
+     * 
+     * 사용자가 프롬프트에서 취소를 누르면 false를 반환한다. 그것을 Number로
+     * 변환하면 0이 된다. 즉 Number가 0 보다 클 때만 다음 코드가 실행하게 한다.
+     * 그리고 혹여나 사용자가 마이너스를 입력하는 경우도 방지하게 된다.
+     */
+    if (number > 0) {
+      // 게임을 시작하면 화면을 활성화
+      document.getElementById('view').style.visibility = 'visible';
+
+      // 참가 순서를 정한다
+      // 여기서는 1 -> 2 -> 3 -> 1 같은 순으로 한다.
+
+      // Element 바인딩
+      const $number = document.getElementById('number');
+      const $word = document.getElementById('word');
+      /** @type HTMLInputElement JSDoc 주석이다. 변수 타입 힌트를 설정한다. */
+      const $input = document.getElementById('input');
+      const $order = document.getElementById('order');
+      const $button = document.getElementById('push-btn');
+      const $wordChain = document.getElementById('word-chain');
+
+      // 참가자 인원 표시
+      $number.textContent = number;
+
+      // 제시어를 저장할 변수를 만든다
+      let word;
+      // 입력할 단어를 저장할 변수를 만든다
+      let newWord;
+      // 대기
+
+      // 단어 입력(input 이벤트)
+      const onInput = (event) => {
+        const inputValue = event.target.value;
+        // 미션 3. 개인 미션, 한글로만 입력할 수 있도록 한다.
+        const regExp = /^[ㄱ-ㅎㅣ가-힣]+$/;
+
+        // 빈문자열이 아닐 때 한글로 입력되었는지 확인한다.
+        if (inputValue && !regExp.test(inputValue)) {
+          // 한글이 아니라면 경고 메시지를 띄우고 입력창을 비운다.
+          alert('한글로만 입력이 가능합니다.');
+          event.target.value = '';
+          return;
+        }
+
+        /**
+         * 미션 1. 입력할 수 있는 단어를 세 글자로 고정하라. 
+         * 세 글자가 아니라면 다시 입력하라고 표시해야한다.
+         */
+        if (inputValue.length > 3) {
+          alert('단어를 세 글자로 다시 입력해주세요.');
+          event.target.value = '';
+          return;
+        }
+
+        newWord = inputValue;
+      };
+
+      // 입력 버튼 클릭(버튼 클릭 이벤트)
+      const onClickButton = () => {
+        // '입력한 단어가 세글자이면서' '제시어가 비어있거나' '입력한 단어가 올바른가'?
+        if (newWord.length === 3 && (!word || word[word.length - 1] === newWord[0])) {
+          // 예. 올바르다
+          // 입력된 단어가 제시어가 된다
+          word = newWord;
+          $word.textContent = word;
+
+          // 다음 사람에게 순서를 넘긴다
+          const order = Number($order.textContent);
+          if (order < number) {
+            $order.textContent = order + 1;
+          } else {
+            $order.textContent = 1;
+          }
+
+
+          // 미션 4. 개인 미션으로 이전에 입력되었던 단어들을 표시한다.
+          if ($wordChain.textContent) {
+            $wordChain.textContent = `${$wordChain.textContent} -> ${word}`;
+          } else {
+            $wordChain.textContent = word;
+          }
+
+        } else if (newWord.length < 3) {
+          // 아니요. 올바르지 않다.
+          // 입력한 글자가 세 글자보다 작은가?
+          // 예. 세 글자를 입력하라고 표시한다
+          alert('입력한 단어가 부족합니다. 세 글자로 입력해주세요.')
+        } else {
+          // 아니요. 올바르지 않다
+          // 입력한 글자가 세 글자보다 작은가?
+          // 아니요. 틀렸다고 표시한다
+          alert('입력한 단어가 틀렸습니다.');
+        }
+
+        // 입력창을 비우고 커서를 포커싱한다
+        $input.value = '';
+        $input.focus();
+      }
+
+      // 이벤트 리스너 설정
+      $input.addEventListener('input', onInput);
+      $button.addEventListener('click', onClickButton);
+    } else {
+      alert('취소를 누르셨거나 잘못 입력하셨습니다. \n새로고침(F5)하여 다시 참여해 주시기 바랍니다.')
+    }
+  </script>
+</body>
+
+</html>

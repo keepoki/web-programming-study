@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계산기</title>
+  <style>
+    * { box-sizing: border-box }
+    body { margin: 0; padding: 0; }
+    .flex { display: flex; height: 100vh; justify-content: center; align-items: center; }
+    .content { 
+      padding: 5px; border: 1px solid black; 
+      box-shadow: 4px 4px 4px 1px rgba(0, 0, 0, 0.3); 
+    }
+    .title { font-size: large; font-weight: bold; text-align: center; }
+    .number-container { display: inline-block; position: relative; }
+    /* preview 문자열이 일정 길이 이상 초과되면 ...으로 표시한다. */
+    .preview { 
+      position: absolute; top: 3px; left: 10px; margin: 0px; 
+      width: 170px; text-align: right; font-size: small; color:gray; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #result { width: 180px; height: 50px; margin: 5px; text-align: right; }
+    #operator { width: 50px; height: 50px; margin: 5px; text-align: center; }
+    button { width: 50px; height: 50px; margin: 5px; }
+  </style>
+</head>
+
+<body>
+  <section class="flex">
+    <div class="content">
+      <p class="title">계산기</p>
+      <input readonly id="operator">
+      <div class="number-container">
+        <p class="preview"></p>
+        <input readonly type="number" id="result">
+      </div>
+      <div class="row">
+        <button id="num-7">7</button>
+        <button id="num-8">8</button>
+        <button id="num-9">9</button>
+        <button id="plus">+</button>
+      </div>
+      <div class="row">
+        <button id="num-4">4</button>
+        <button id="num-5">5</button>
+        <button id="num-6">6</button>
+        <button id="minus">-</button>
+      </div>
+      <div class="row">
+        <button id="num-1">1</button>
+        <button id="num-2">2</button>
+        <button id="num-3">3</button>
+        <button id="divide">/</button>
+      </div>
+      <div class="row">
+        <button id="clear">C</button>
+        <button id="num-0">0</button>
+        <button id="calculate">=</button>
+        <button id="multiply">x</button>
+      </div>
+    </div>
+  </section>
+  <script>
+    let numOne = '';
+    let operator = '';
+    let numTwo = '';
+    let isCalculate = false;
+    const $operator = document.querySelector('#operator');
+    const $result = document.querySelector('#result');
+    const $preview = document.querySelector('.preview'); // 계산 입력 미리보기
+    const onClickNumber = (event) => {
+      if (!operator) {
+        /* 
+          개인 미션 2. 계산이 끝난 후 연산자가 아닌 숫자를 누르게 되면 
+          숫자가 꼬여버리는 버그 수정
+          1 + 4 + 5 같이 연산하고자 할 때 1 + 4 = 5 + 5의 순서로 진행하는데
+          1 + 4 = 5의 상황에서 숫자를 입력하면 계산이 꼬여버린다.
+        */
+        if (isCalculate) { 
+          clear();
+        }
+        numOne += event.target.textContent;
+        $result.value += event.target.textContent;
+        $preview.textContent += event.target.textContent;
+        return;
+      }
+      if (!numTwo) {
+        $result.value = '';
+      }
+      numTwo += event.target.textContent;
+      $result.value += event.target.textContent;
+      $preview.textContent += event.target.textContent;
+    };
+    document.querySelector('#num-0').addEventListener('click', onClickNumber);
+    document.querySelector('#num-1').addEventListener('click', onClickNumber);
+    document.querySelector('#num-2').addEventListener('click', onClickNumber);
+    document.querySelector('#num-3').addEventListener('click', onClickNumber);
+    document.querySelector('#num-4').addEventListener('click', onClickNumber);
+    document.querySelector('#num-5').addEventListener('click', onClickNumber);
+    document.querySelector('#num-6').addEventListener('click', onClickNumber);
+    document.querySelector('#num-7').addEventListener('click', onClickNumber);
+    document.querySelector('#num-8').addEventListener('click', onClickNumber);
+    document.querySelector('#num-9').addEventListener('click', onClickNumber);
+    const onClickOperator = (op) => () => {
+      if (numOne) {
+        operator = op;
+        $operator.value = op;
+
+        /* 
+          개인 미션 1. 계산 입력된 숫자나 연산자 미리보기
+          연산자를 +++ 같이 여러번 누르거나, + 에서 - 같이 바꾸는 경우
+          기존에 있던 연산자는 지운다. 
+        */
+        const lastChar = $preview.textContent[$preview.textContent.length - 1];
+        if ((/[^0-9]/g).exec(lastChar)) {
+          $preview.textContent = $preview.textContent.slice(0, -1)
+        }
+        $preview.textContent += op;
+      } else {
+        alert('숫자를 먼저 입력하세요.');
+      }
+    };
+    document.querySelector('#plus').addEventListener('click', onClickOperator('+'));
+    document.querySelector('#minus').addEventListener('click', onClickOperator('-'));
+    document.querySelector('#divide').addEventListener('click', onClickOperator('/'));
+    document.querySelector('#multiply').addEventListener('click', onClickOperator('*'));
+    document.querySelector('#calculate').addEventListener('click', (event) => {
+      if (numTwo) {
+        switch (operator) {
+          case '+':
+            $result.value = parseInt(numOne) + parseInt(numTwo);
+            break;
+          case '-':
+            $result.value = numOne - numTwo;
+            break;
+          case '*':
+            $result.value = numOne * numTwo;
+            break;
+          case '/':
+            $result.value = numOne / numTwo;
+            break;
+          default:
+            break;
+        }
+        $operator.value = '=';
+        numOne = $result.value;
+        numTwo = '';
+        operator = '';
+        isCalculate = true;
+        $preview.textContent += event.target.textContent + $result.value;
+      } else {
+        alert('숫자를 먼저 입력하세요.');
+      }
+    });
+    const clear = () => {
+      numOne = '';
+      operator = '';
+      numTwo = '';
+      $operator.value = '';
+      $result.value = '';
+      $preview.textContent = '';
+      isCalculate = false;
+    }
+    document.querySelector('#clear').addEventListener('click', clear);
+  </script>
+</body>
+</html>
