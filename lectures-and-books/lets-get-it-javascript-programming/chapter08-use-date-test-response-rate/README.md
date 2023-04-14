@@ -271,6 +271,3 @@ const average = records.reduce((a, c) => a + c) / records.length;
 |a(누적값)|0|1|3|6|10|
 |c(현잿값)|1|2|3|4|5|
 |a + c(반환값)|1|3|6|10|15|
-
-
-![표 8-1 초깃값이 있는 reduce 계산표](./images/chart-8-1.png)
