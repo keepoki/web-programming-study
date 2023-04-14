@@ -2,6 +2,25 @@
 
 컴퓨터와 가위바위보를 해서 몇 번 이겼는지 점수를 기록한다. 객체의 사용법을 익히고 타이머를 멈췄다가 재개하는 방법을 배운다.
 
+- [7.1 순서도 그리기](#71-순서도-그리기)
+  - [코드 작성](#코드-작성)
+  - [실행 결과](#실행-결과)
+- [7.2 객체로 변수 묶기](#72-객체로-변수-묶기)
+- [7.3 일정 시간마다 반복하기](#73-일정-시간마다-반복하기)
+  - [1분 퀴즈 1번 문제](#1분-퀴즈-1번-문제)
+- [7.4 타이머 멈췄다 다시 실행하기](#74-타이머-멈췄다-다시-실행하기)
+  - [1분 퀴즈 2번 문제](#1분-퀴즈-2번-문제)
+- [7.5 가위바위보 규칙 찾기](#75-가위바위보-규칙-찾기)
+  - [1분 퀴즈 3번 문제](#1분-퀴즈-3번-문제)
+- [마무리 요약](#마무리-요약)
+  - [setInterval](#setinterval)
+  - [clearInterval, clearTimeout](#clearinterval-cleartimeout)
+  - [배열.includes](#배열includes)
+  - [removeEventListener](#removeeventlistener)
+- [Self Check 5판 3선승제로 만들기](#self-check-5판-3선승제로-만들기)
+  - [소스코드](#소스코드)
+  - [결과](#결과)
+
 ## 7.1 순서도 그리기
 
 가위, 바위, 보 버튼을 누르면 승부를 표시하기 위해 돌아가는 그림을 1초 동안 멈추도록 한다.
@@ -284,14 +303,17 @@ const clickButton = () => {
 ```
 
 다음으로 승부를 어떻게 결정할지 생각해야 한다. 가위바위보에는 무승부도 존재한다. 간단하게 if 문을 사용해서 모든 경우를 직접 코딩해도 된다. 하지만 코드가 너무 길어진다.
+**가위를 낸 경우를 1, 바위를 0, 보를 -1**이라고 가정하고 두 값의 차이를 구해 다음과 같이 표를 만들어보자.
 
 | 나\컴퓨터 | 가위 | 바위 | 보 |
 |:-:|:-:|:-:|:-:|
-| 가위 | 0 | 1 | 2 |
-| 바위 | -1 | 0 | 1 |
-| 보 | -2 | -1 | 0 |
+| 가위 | 0  | 1  | 2 |
+| 바위 | -1 | 0  | 1 |
+|  보  | -2 | -1 | 0 |
 
 가위바위보 점수 표를 보면서 규칙을 정리하면 무승부이면 0, 이기면 2 또는 -1, 지면 1또는 -2가 나온다. 승부를 판단하면 다음과 같이 코드를 줄일 수 있다.
+가위를 2, 바위를 1, 보를 0으로 하더라도 가위 부터 보까지 숫자의 정렬이 같고 각각의 숫자의 차이가 1이라서 표는 똑같아진다.
+반대로 가위를 0, 바위를 1, 보를 2로 한다면 음수와 양수의 값이 반전 되어 이기면 -2 또는 1, 지면 -1 또는 2가 나오게 된다.
 
 ```js
 const scoreTable = {
@@ -331,3 +353,307 @@ const clickButton = () => {
 `diff === 2 || diff === -1` 같은 OR 조건문은 `[2, -1].includes(diff)` 방식으로 코드를 더 간결하게 작성할 수 있다.
 
 마지막으로 승리 시 1점, 패배 시 -1점을 주고 #score 태그에 메시지까지 표시하는 절차를 완성한다.
+
+```js
+// 가위: 1,  바위: 0,   보: -1
+// 나\컴퓨터  가위    바위    보
+// 가위       0       1       2
+// 바위      -1       0       1
+// 보        -2      -1       0
+const scoreTable = {
+  rock: 0,
+  scissors: 1,
+  paper: -1,
+};
+
+let clickable = true;
+let score = 0;
+const clickButton = () => {
+  if (clickable) {
+    clearInterval(intervalId);
+    clickable = false;
+    const myChoice = event.target.textContent === '바위'
+      ? 'rock'
+      : event.target.textContent === '가위'
+        ? 'scissors'
+        : 'paper';
+    const myScore = scoreTable[myChoice];
+    const computerScore = scoreTable[computerChoice];
+    const diff = myScore - computerScore;
+    let message;
+    if ([2, -1].includes(diff)) {
+      score += 1;
+      message = '승리';
+    } else if ([-2, 1].includes(diff)) {
+      score -= 1;
+      message = '패배';
+    } else {
+      message = '무승부';
+    }
+    $score.textContent = `${message} 총: ${score}점`;
+    setTimeout(() => {
+      clickable = true;
+      intervalId = setInterval(changeComputerHand, 50);
+    }, 1000);
+  }
+};
+```
+
+### 1분 퀴즈 3번 문제
+
+표 7-1처럼 가위, 바위, 보에 대한 또다른 규칙을 만들어 실행해 보세요.
+
+가위를 -1, 바위를 1, 보를 0으로 정하고 표를 작성한다.
+
+| 나\컴퓨터 | 가위 | 바위 | 보 |
+|:-:|:-:|:-:|:-:|
+| 가위 | 0 | -2 | -1 |
+| 바위 | 2 |  0 |  1 |
+| 보   | 1 | -1 |  0 |
+
+이기는 경우는 -1 또는 2, 지는 경우는 -2 또는 1이다.
+
+```js
+// 가위: -1,  바위: 1,   보: 0
+// 나\컴퓨터  가위    바위    보
+// 가위       0      -2      -1
+// 바위       2       0       1
+// 보         1      -1       0
+const scoreTable = {
+  scissors: -1,
+  rock: 1,
+  paper: 0,
+};
+
+let clickable = true;
+let score = 0;
+const clickButton = () => {
+  if (clickable) {
+    clearInterval(intervalId);
+    clickable = false;
+    const myChoice = event.target.textContent === '바위'
+      ? 'rock'
+      : event.target.textContent === '가위'
+        ? 'scissors'
+        : 'paper';
+    const myScore = scoreTable[myChoice];
+    const computerScore = scoreTable[computerChoice];
+    const diff = myScore - computerScore;
+    let message;
+    if ([2, -1].includes(diff)) {
+      score += 1;
+      message = '승리';
+    } else if ([-2, 1].includes(diff)) {
+      score -= 1;
+      message = '패배';
+    } else {
+      message = '무승부';
+    }
+    $score.textContent = `${message} 총: ${score}점`;
+    setTimeout(() => {
+      clickable = true;
+      intervalId = setInterval(changeComputerHand, 50);
+    }, 1000);
+  }
+};
+```
+
+그런데 아무리 숫자를 바꿔도 아래 표에서 정답은 바뀌지 않는다.
+
+| 나\컴퓨터 | 가위 | 바위 | 보 |
+|:-:|:-:|:-:|:-:|
+| 가위 | 비김 |  짐  | 이김 |
+| 바위 | 이김 | 비김 |   짐 |
+| 보   |  짐  | 이김 | 비김 |
+
+정한 숫자에 따라 값의 종류가 늘어날 수도 있다. 가위를 1, 바위를 10, 보를 100으로 정한다면 이기거나 지는 경우의 숫자가 각각 3개가 된다. 이기는 경우의 숫자는 -99 또는 9 또는 90, 지는 경우의 숫자는 -9 또는 -90 또는 99가 된다.
+
+## 마무리 요약
+
+이 장에서 배운 내용을 정리해 보겠습니다.
+
+### setInterval
+
+setTimeout과 비슷한 효과를 냅니다. 다만, 한 번만 실행되는 setTimeout과는 달리 지정한 시간마다 주기적으로 지정한 함수를 실행합니다.
+
+```js
+setInterval(() => {
+  // 내용
+}, 밀리초);
+```
+
+### clearInterval, clearTimeout
+
+setInterval과 setTimeout 함수는 각각 clearInterval과 clearTimeout 함수로 취소할 수 있습니다. 다만, clearTimeout은 setTimeout에 지정한 함수가 아직 실행되지 않았을 때만 취소할 수 있습니다.
+
+```js
+let 아이디 = setInterval(함수, 밀리초);
+clearInterval(아이디);
+let 아이디 = setTimeout(함수, 밀리초);
+clearTimeout(아이디);
+```
+
+### 배열.includes
+
+||을 사용한 코드는 배열의 includes 메서드로 반복을 줄일 수 있습니다. 다음 두 코드는 같은 작업을 수행합니다.
+
+```js
+diff === '바나나' || diff === '사과' || diff === '오렌지'
+// 또는
+['바나나', '사과', '오렌지'].includes(diff)
+```
+
+### removeEventListener
+
+addEventListener로 연결한 함수를 removeEventListener로 제거할 수 있습니다. 단, 연결할 때의 함수와 제거할 때의 함수가 같아야 합니다.
+
+```js
+function 함수() {}
+태그.addEventListener('이벤트', 함수);
+태그.removeEventListener('이벤트', 함수);
+```
+
+## Self Check 5판 3선승제로 만들기
+
+가위바위보 게임은 무한히 반복되므로 어느 순간이 되면 게임을 마무리하고 싶습니다. 게임을 5판 3선승제로 만들어 3번 먼저 이긴 쪽이 최종 승리하는 것으로 바꿔 봅시다. 단, 무승부가 나면 무효 판으로 칩니다.
+
+힌트: 컴퓨터의 점수와 내 점수를 따로 계산합니다.
+
+### 소스코드
+
+```html
+<body>
+  <div style="font-weight: bold;">가위바위보 게임!</div>
+  <div style="font-weight: bold;">5판 3선승제</div>
+  <br/>
+  <div id="computer"></div>
+  <br/>
+  <div>
+    <button id="scissors" class="btn">가위</button>
+    <button id="rock" class="btn">바위</button>
+    <button id="paper" class="btn">보</button>
+  </div>
+  <br/>
+  <div id="round">-</div>
+  <div id="score">-</div>
+  <br/>
+  <div id="result">-</div>
+  <br/>
+  <button class="btn reset-btn">초기화</button>
+  <script>
+    const $computer = document.querySelector('#computer');
+    const $round = document.querySelector('#round');
+    const $score = document.querySelector('#score');
+    const $result = document.querySelector('#result'); // 승패 결과 텍스트
+    const $rock = document.querySelector('#rock');
+    const $scissors = document.querySelector('#scissors');
+    const $paper = document.querySelector('#paper');
+    const $resetBtn = document.querySelector('.reset-btn'); // 초기화 버튼
+    const IMG_URL = './images/rsp.png';
+    $computer.style.background = `url(${IMG_URL}) 0 0`;
+    $computer.style.backgroundSize = 'auto 200px';
+    const rspX = {
+      scissors: '0', // 가위
+      rock: '-220px', // 바위
+      paper: '-440px', // 보
+    };
+
+    let computerChoice = 'scissors';
+    const changeComputerHand = () => {
+      if (computerChoice === 'rock') {
+        computerChoice = 'scissors';
+      } else if (computerChoice === 'scissors') {
+        computerChoice = 'paper';
+      } else if (computerChoice === 'paper') {
+        computerChoice = 'rock';
+      }
+      $computer.style.background = `url(${IMG_URL}) ${rspX[computerChoice]} 0`;
+      $computer.style.backgroundSize = 'auto 200px';
+    }
+    let intervalId = setInterval(changeComputerHand, 50);
+
+    // 가위: -1,  바위: 1,   보: 0
+    // 나\컴퓨터  가위    바위    보
+    // 가위       0      -2      -1
+    // 바위       2       0       1
+    // 보         1      -1       0
+    const scoreTable = {
+      scissors: -1,
+      rock: 1,
+      paper: 0,
+    };
+
+    let clickable = true;
+    let computerScore = 0; // 컴퓨터 점수
+    let myScore = 0; // 나의 점수
+    let draw = 0; // 무승부 횟수
+    let round = 1; // 라운드
+    const clickButton = () => {
+      if (round > 5) return;
+
+      if (clickable) {
+        clearInterval(intervalId);
+        clickable = false;
+        const myChoice = event.target.textContent === '바위'
+          ? 'rock'
+          : event.target.textContent === '가위'
+            ? 'scissors'
+            : 'paper';
+        const myChoiceNumber = scoreTable[myChoice];
+        const computerNumber = scoreTable[computerChoice];
+        const diff = myChoiceNumber - computerNumber;
+        let message;
+        if ([2, -1].includes(diff)) {
+          myScore += 1;
+          message = '승리';
+        } else if ([-2, 1].includes(diff)) {
+          computerScore += 1;
+          message = '패배';
+        } else {
+          draw += 1;
+          message = '무승부';
+        }
+        $round.textContent = `${round++} 라운드 ${message}`;
+        $score.textContent = `${myScore}승 ${computerScore}패 ${draw}무`;
+        
+        // 3승 이상이면 승패 결과를 표시, 초기화 버튼 활성화
+        if (myScore > 2) {
+          $result.textContent = `플레이어의 승리입니다.`
+          $resetBtn.style.visibility = 'visible';
+        } else if(computerScore > 2) {
+          $result.textContent = `컴퓨터의 승리입니다.`
+          $resetBtn.style.visibility = 'visible';
+        } else if (round > 5) {
+          $result.textContent = '무승부 입니다.';
+          $resetBtn.style.visibility = 'visible';
+        } else {
+          setTimeout(() => {
+            clickable = true;
+            intervalId = setInterval(changeComputerHand, 50);
+          }, 1000);
+          $resetBtn.style.visibility = 'hidden';
+        }
+      }
+    };
+    const reset = () => {
+      computerScore = 0;
+      myScore = 0;
+      draw = 0;
+      round = 1;
+      $round.textContent = '-';
+      $score.textContent = '-';
+      $result.textContent = '-';
+      intervalId = setInterval(changeComputerHand, 50);
+      clickable = true;
+    };
+    $rock.addEventListener('click', clickButton);
+    $scissors.addEventListener('click', clickButton);
+    $paper.addEventListener('click', clickButton);
+    $resetBtn.addEventListener('click', reset);
+  </script>
+</body>
+```
+
+### 결과
+
+![Self Check 결과 GIF](./images/self-check-result.gif)

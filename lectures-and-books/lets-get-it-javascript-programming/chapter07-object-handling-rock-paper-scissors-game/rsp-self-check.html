@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+  <meta charset="utf-8" />
+  <title>가위바위보</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      place-content: center;
+      height: 100vh;
+    }
+    #computer {
+      width: 165px;
+      height: 200px;
+    }
+    .btn {
+      padding: 5px;
+      min-width: 40px;
+      max-width: 100px;
+      border: none;
+      border-radius: 4px;
+      box-shadow: 2px 2px 2px grey;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: rgba(200, 200, 200, 0.5);
+    }
+    .reset-btn {
+      visibility: hidden;
+      border-radius: 10px;
+      background-color: #0a0a23;
+      color: white;
+    }
+    .reset-btn:hover {
+      background-color: #2c2c36;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="font-weight: bold;">가위바위보 게임!</div>
+  <div style="font-weight: bold;">5판 3선승제</div>
+  <br/>
+  <div id="computer"></div>
+  <br/>
+  <div>
+    <button id="scissors" class="btn">가위</button>
+    <button id="rock" class="btn">바위</button>
+    <button id="paper" class="btn">보</button>
+  </div>
+  <br/>
+  <div id="round">-</div>
+  <div id="score">-</div>
+  <br/>
+  <div id="result">-</div>
+  <br/>
+  <button class="btn reset-btn">초기화</button>
+  <script>
+    const $computer = document.querySelector('#computer');
+    const $round = document.querySelector('#round');
+    const $score = document.querySelector('#score');
+    const $result = document.querySelector('#result');
+    const $rock = document.querySelector('#rock');
+    const $scissors = document.querySelector('#scissors');
+    const $paper = document.querySelector('#paper');
+    const $resetBtn = document.querySelector('.reset-btn');
+    const IMG_URL = './images/rsp.png';
+    $computer.style.background = `url(${IMG_URL}) 0 0`;
+    $computer.style.backgroundSize = 'auto 200px';
+    const rspX = {
+      scissors: '0', // 가위
+      rock: '-220px', // 바위
+      paper: '-440px', // 보
+    };
+
+    let computerChoice = 'scissors';
+    const changeComputerHand = () => {
+      if (computerChoice === 'rock') {
+        computerChoice = 'scissors';
+      } else if (computerChoice === 'scissors') {
+        computerChoice = 'paper';
+      } else if (computerChoice === 'paper') {
+        computerChoice = 'rock';
+      }
+      $computer.style.background = `url(${IMG_URL}) ${rspX[computerChoice]} 0`;
+      $computer.style.backgroundSize = 'auto 200px';
+    }
+    let intervalId = setInterval(changeComputerHand, 50);
+
+    // 가위: -1,  바위: 1,   보: 0
+    // 나\컴퓨터  가위    바위    보
+    // 가위       0      -2      -1
+    // 바위       2       0       1
+    // 보         1      -1       0
+    const scoreTable = {
+      scissors: -1,
+      rock: 1,
+      paper: 0,
+    };
+
+    let clickable = true;
+    let computerScore = 0; // 컴퓨터 점수
+    let myScore = 0; // 나의 점수
+    let draw = 0; // 무승부 횟수
+    let round = 1; // 라운드
+    const clickButton = () => {
+      if (round > 5) return;
+
+      if (clickable) {
+        clearInterval(intervalId);
+        clickable = false;
+        const myChoice = event.target.textContent === '바위'
+          ? 'rock'
+          : event.target.textContent === '가위'
+            ? 'scissors'
+            : 'paper';
+        const myChoiceNumber = scoreTable[myChoice];
+        const computerNumber = scoreTable[computerChoice];
+        const diff = myChoiceNumber - computerNumber;
+        let message;
+        if ([2, -1].includes(diff)) {
+          myScore += 1;
+          message = '승리';
+        } else if ([-2, 1].includes(diff)) {
+          computerScore += 1;
+          message = '패배';
+        } else {
+          draw += 1;
+          message = '무승부';
+        }
+        $round.textContent = `${round++} 라운드 ${message}`;
+        $score.textContent = `${myScore}승 ${computerScore}패 ${draw}무`;
+        
+        // 3승 이상이면 승패 결과를 표시, 초기화 버튼 활성화
+        if (myScore > 2) {
+          $result.textContent = `플레이어의 승리입니다.`
+          $resetBtn.style.visibility = 'visible';
+        } else if(computerScore > 2) {
+          $result.textContent = `컴퓨터의 승리입니다.`
+          $resetBtn.style.visibility = 'visible';
+        } else if (round > 5) {
+          $result.textContent = '무승부 입니다.';
+          $resetBtn.style.visibility = 'visible';
+        } else {
+          setTimeout(() => {
+            clickable = true;
+            intervalId = setInterval(changeComputerHand, 50);
+          }, 1000);
+          $resetBtn.style.visibility = 'hidden';
+        }
+      }
+    };
+    const reset = () => {
+      computerScore = 0;
+      myScore = 0;
+      draw = 0;
+      round = 1;
+      $round.textContent = '-';
+      $score.textContent = '-';
+      $result.textContent = '-';
+      intervalId = setInterval(changeComputerHand, 50);
+      clickable = true;
+    };
+    $rock.addEventListener('click', clickButton);
+    $scissors.addEventListener('click', clickButton);
+    $paper.addEventListener('click', clickButton);
+    $resetBtn.addEventListener('click', reset);
+  </script>
+</body>
+</html>

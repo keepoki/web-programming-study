@@ -26,16 +26,13 @@
     const $scissors = document.querySelector('#scissors');
     const $paper = document.querySelector('#paper');
     const IMG_URL = './images/rsp.png';
-    $computer.style.background = `url(${IMG_URL}) 0 0`; // 가위
-    $computer.style.background = `url(${IMG_URL}) -220px 0`; // 바위
-    $computer.style.background = `url(${IMG_URL}) -440px 0`; // 보
+    $computer.style.background = `url(${IMG_URL}) 0 0`;
     $computer.style.backgroundSize = 'auto 200px';
-
     const rspX = {
       scissors: '0', // 가위
       rock: '-220px', // 바위
       paper: '-440px', // 보
-    }
+    };
 
     let computerChoice = 'scissors';
     const changeComputerHand = () => {
@@ -50,13 +47,20 @@
       $computer.style.backgroundSize = 'auto 200px';
     }
     let intervalId = setInterval(changeComputerHand, 50);
+
+    // 가위: -1,  바위: 1,   보: 0
+    // 나\컴퓨터  가위    바위    보
+    // 가위       0      -2      -1
+    // 바위       2       0       1
+    // 보         1      -1       0
     const scoreTable = {
-      rock: 0,
-      scissors: 1,
-      paper: -1,
+      scissors: -1,
+      rock: 1,
+      paper: 0,
     };
 
     let clickable = true;
+    let score = 0;
     const clickButton = () => {
       if (clickable) {
         clearInterval(intervalId);
@@ -69,13 +73,17 @@
         const myScore = scoreTable[myChoice];
         const computerScore = scoreTable[computerChoice];
         const diff = myScore - computerScore;
+        let message;
         if ([2, -1].includes(diff)) {
-          console.log('승리');
+          score += 1;
+          message = '승리';
         } else if ([-2, 1].includes(diff)) {
-          console.log('패배');
+          score -= 1;
+          message = '패배';
         } else {
-          console.log('무승부');
+          message = '무승부';
         }
+        $score.textContent = `${message} 총: ${score}점`;
         setTimeout(() => {
           clickable = true;
           intervalId = setInterval(changeComputerHand, 50);
