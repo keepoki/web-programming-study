@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로또 추첨기</title>
+  <style>
+    .ball {
+      display: inline-block;
+      border: 1px solid black;
+      border-radius: 20px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 20px;
+      text-align: center;
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="result">추첨 결과는? </div>
+  <div id="bonus">보너스: </div>
+  <script>
+    // 1~45까지 숫자의 배열을 만든다.
+    const candidate = Array(45).fill().map((v, i) => i + 1);
+
+    // 45개의 숫자를 섞는다.
+    const shuffle = [];
+    while (candidate.length > 0) {
+      const random = Math.floor(Math.random() * candidate.length); // 무작위 인덱스 뽑기
+      const spliceArray = candidate.splice(random, 1); // 뽑은 값은 배열에 들어 있음
+      const value = spliceArray[0]; // 배열에 들어 있는 값을 꺼내어
+      shuffle.push(value); // shuffle 배열에 넣기
+    }
+    console.log(shuffle);
+    const winBalls = shuffle.slice(0, 6).sort((a, b) => a - b); // [0] ~ [5]
+    const bonus = shuffle[6];
+    console.log(winBalls, bonus);
+    const $result = document.querySelector('#result');
+    function drawBall(number, $parent) {
+      const $ball = document.createElement('div');
+      $ball.className = 'ball';
+      $ball.textContent = number;
+      $parent.appendChild($ball);
+    }
+
+    for (let i = 0; i < winBalls.length; i++) {
+      setTimeout(() => {
+        drawBall(winBalls[i], $result);
+      }, 1000 * (i + 1));
+    }
+
+    const $bonus = document.querySelector('#bonus');
+    setTimeout(() => {
+      drawBall(bonus, $bonus);
+    }, 7000);
+  </script>
+</body>
+</html>

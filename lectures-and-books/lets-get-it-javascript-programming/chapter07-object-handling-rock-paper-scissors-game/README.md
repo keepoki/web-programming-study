@@ -470,8 +470,6 @@ const clickButton = () => {
 
 ## 마무리 요약
 
-이 장에서 배운 내용을 정리해 보겠습니다.
-
 ### setInterval
 
 setTimeout과 비슷한 효과를 냅니다. 다만, 한 번만 실행되는 setTimeout과는 달리 지정한 시간마다 주기적으로 지정한 함수를 실행합니다.
