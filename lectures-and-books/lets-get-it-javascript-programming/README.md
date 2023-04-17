@@ -38,3 +38,4 @@ Let's Get It 자바스크립트 프로그래밍 책 & 강의 학습에 대한 �
 6. [타이머 사용하기 _로또 추첨기](./chapter06-using-timer-lotto-lottery-machine)
 7. [객체 다루기_가위바위보 게임](./chapter07-object-handling-rock-paper-scissors-game)
 8. [Date 사용하기_반응속도 테스트](./chapter08-use-date-test-response-rate)
+9. [이차원 배열 다루기_틱택토 게임](./chapter09-handling-two-dimensional-arrays-tictactoe-game/)
