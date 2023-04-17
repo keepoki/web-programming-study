@@ -2,7 +2,29 @@
 
 이 장에서는 틱택토 게임을 만든다. 틱택토(tic-tac-toe) 게임은 오목의 축소판인 삼목이라고 보면 된다. 삼목은 바둑판이 아니라 3 x 3 표 위에서 진행한다.
 
-표와 같은 삼목 데이터는 자바스크립트에서 이차원 배열로 표현한다. 틱택토를 만들면서 이차원 배열로 데이터를 관리하고, 배열 데이터를 HTML 하면에 그대로 표시하는 작업을 집중ㅈ거으로 배워 보자.
+표와 같은 삼목 데이터는 자바스크립트에서 이차원 배열로 표현한다. 틱택토를 만들면서 이차원 배열로 데이터를 관리하고, 배열 데이터를 HTML 하면에 그대로 표시하는 작업을 집중적으로 배워 보자.
+
+- [9.1 순서도 그리기](#91-순서도-그리기)
+- [9.2 이차원 배열 다루기\_틱택토](#92-이차원-배열-다루기_틱택토)
+- [9.3 표 직접 그리기](#93-표-직접-그리기)
+  - [1분 퀴즈 1번 문제](#1분-퀴즈-1번-문제)
+  - [1분 퀴즈 2번 문제](#1분-퀴즈-2번-문제)
+- [9.4 차례 전환하기](#94-차례-전환하기)
+  - [1분 퀴즈 3번 문제](#1분-퀴즈-3번-문제)
+- [9.5 승부 판단하기](#95-승부-판단하기)
+  - [1분 퀴즈 4번 문제](#1분-퀴즈-4번-문제)
+- [마무리 요약](#마무리-요약)
+  - [이차원 배열](#이차원-배열)
+  - [구조분해 할당](#구조분해-할당)
+  - [이벤트 버블링](#이벤트-버블링)
+  - [parentNode와 children](#parentnode와-children)
+  - [rowIndex와 cellIndex](#rowindex와-cellindex)
+  - [유사 배열 객체와 Array.from](#유사-배열-객체와-arrayfrom)
+  - [every와 some](#every와-some)
+  - [flat](#flat)
+- [Self Check 컴퓨터 차례 구현하기](#self-check-컴퓨터-차례-구현하기)
+  - [소스코드](#소스코드)
+  - [결과](#결과)
 
 ## 9.1 순서도 그리기
 
@@ -628,3 +650,51 @@ array2.flat(); // [1, 2, 3, [4, 5, 6], [7, 8, 9]]
 
 힌트: 컴퓨터의 차례는 callback 함수 안에 구현합니다. rows 배열에서 비어 있는 칸들도 추리면 되겠죠?
 
+### 소스코드
+
+기존 소스코드에서 `callback`함수 안의 내용만 바꿔주면 된다. 그리고 승리와 무승부에 대한 결과를 표시하는 기능이 중복되어 함수로 `showResult`함수로 묶었다.
+
+```js
+...
+const callback = (event) => {
+  if (event.target.textContent !== '') { // 칸이 이미 채워져 있는가?
+    console.log('빈칸이 아닙니다.');
+    return;
+  }
+  // 빈칸이면
+  console.log('빈칸입니다');
+  event.target.textContent = turn;
+  if(showResult(checkWinner(event.target))) return;
+  turn = turn === 'X' ? 'O' : 'X';
+
+  // Self Check 컴퓨터 차례 구현하기
+  if (turn === 'X') {
+    const emptyCellList = rows.flat().filter((cell) => !cell.textContent);
+    const randomCell = emptyCellList[Math.floor(Math.random() * emptyCellList.length)];
+    randomCell.textContent = turn;
+    if(showResult(checkWinner(randomCell))) return;
+    turn = turn === 'X' ? 'O' : 'X';
+  }
+};
+
+const showResult = (hasWinner) => {
+  // 승자가 있으면
+  if (hasWinner) {
+    $result.textContent = `${turn}님이 승리!`;
+    $table.removeEventListener('click', callback);
+    return true;
+  }
+  // 무승부라면
+  const draw = rows.flat().every((cell) => cell.textContent);
+  if (draw) {
+    $result.textContent = `무승부`;
+    return true;
+  }
+  return false;
+}
+...
+```
+
+### 결과
+
+![Self Check 결과 화면](./images/self-check-result.gif)

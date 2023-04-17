@@ -42,7 +42,7 @@
       }
       // 세로줄 검사
       if (
-        rows[0][cellIndex].textContent   === turn &&
+        rows[0][cellIndex].textContent === turn &&
         rows[1][cellIndex].textContent === turn &&
         rows[2][cellIndex].textContent === turn
       ) {
@@ -74,21 +74,34 @@
       // 빈칸이면
       console.log('빈칸입니다');
       event.target.textContent = turn;
-      const hasWinner = checkWinner(event.target);
+      if(showResult(checkWinner(event.target))) return;
+      turn = turn === 'X' ? 'O' : 'X';
+
+      // Self Check 컴퓨터 차례 구현하기
+      if (turn === 'X') {
+        const emptyCellList = rows.flat().filter((cell) => !cell.textContent);
+        const randomCell = emptyCellList[Math.floor(Math.random() * emptyCellList.length)];
+        randomCell.textContent = turn;
+        if(showResult(checkWinner(randomCell))) return;
+        turn = turn === 'X' ? 'O' : 'X';
+      }
+    };
+
+    const showResult = (hasWinner) => {
       // 승자가 있으면
       if (hasWinner) {
         $result.textContent = `${turn}님이 승리!`;
         $table.removeEventListener('click', callback);
-        return;
+        return true;
       }
-      // 승자가 없으면
+      // 무승부라면
       const draw = rows.flat().every((cell) => cell.textContent);
       if (draw) {
         $result.textContent = `무승부`;
-        return;
+        return true;
       }
-      turn = turn === 'X' ? 'O' : 'X';
-    };
+      return false;
+    }
 
     for (let i = 1; i <= 3; i += 1) {
       const $tr = document.createElement('tr');
