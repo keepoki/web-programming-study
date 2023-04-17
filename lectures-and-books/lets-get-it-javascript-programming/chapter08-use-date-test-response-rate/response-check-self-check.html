@@ -27,13 +27,32 @@
 <body>
   <div id="screen" class="waiting">클릭해서 시작하세요</div>
   <div id="result"></div>
+  <div id="fast-list"></div>
   <script>
     const $screen = document.querySelector('#screen');
     const $result = document.querySelector('#result');
+    const $fastList = document.querySelector('#fast-list');
     let startTime;
     let endTime;
     const records = [];
     let timeoutId; // timeoutId 추가
+
+    /**
+     * Self Check 속도 순으로 정렬하기
+     * @param {array} records
+     */
+    const drawFastList = (records) => {
+      if (!records || records.length < 1)  return;
+      // sort는 원본 배열에 영향을 준다. 깊은 복사로 처리
+      const fastList = [...records];
+      fastList.sort();
+      const length = fastList.length > 5 ? 5 : fastList.length;
+      let listStr = '<p>반응 속도 TOP 5</p>\n';
+      for (let i = 0; i < length; ++i) {
+        listStr += `<p>${i + 1}. ${fastList[i]}ms</p>\n`;
+      }
+      $fastList.innerHTML = listStr;
+    }
 
     $screen.addEventListener('click', function () {
       if ($screen.classList.contains('waiting')) { // 대기 화면
@@ -63,6 +82,7 @@
         $screen.classList.remove('now');
         $screen.classList.add('waiting');
         $screen.textContent = '클릭해서 시작하세요';
+        drawFastList(records); // 가장 빠른 목록 표시
       }
     });
   </script>

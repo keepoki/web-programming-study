@@ -30,8 +30,11 @@ Let's Get It 자바스크립트 프로그래밍 책 & 강의 학습에 대한 �
 
 ## 목차
 
-1. [Hello, JavaScript](/lectures-and-books/lets-get-it-javascript-programming/chapter01-hello-javascript)
-2. [기본 문법 배우기](/lectures-and-books/lets-get-it-javascript-programming/chapter02-basic-syntax)
-3. [DOM 객체 다루기](/lectures-and-books/lets-get-it-javascript-programming/chapter03-handling-DOM-object)
-4. [함수 사용하기 _계산기](/lectures-and-books/lets-get-it-javascript-programming/chapter04-using-functions-calculator)
-5. [반복문 사용하기 _숫자야구 게임](/lectures-and-books/lets-get-it-javascript-programming/chapter05-using-loop-statements-number-baseball-game)
+1. [Hello, JavaScript](./chapter01-hello-javascript)
+2. [기본 문법 배우기](./chapter02-basic-syntax)
+3. [DOM 객체 다루기](./chapter03-handling-DOM-object)
+4. [함수 사용하기 _계산기](./chapter04-using-functions-calculator)
+5. [반복문 사용하기 _숫자야구 게임](./chapter05-using-loop-statements-number-baseball-game)
+6. [타이머 사용하기 _로또 추첨기](./chapter06-using-timer-lotto-lottery-machine)
+7. [객체 다루기_가위바위보 게임](./chapter07-object-handling-rock-paper-scissors-game)
+8. [Date 사용하기_반응속도 테스트](./chapter08-use-date-test-response-rate)
