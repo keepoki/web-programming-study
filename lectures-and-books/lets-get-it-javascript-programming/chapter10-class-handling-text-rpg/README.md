@@ -676,4 +676,103 @@ b.bind(document)(); // window
 > <https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/this>
 > <https://web.dev/i18n/ko/javascript-this/>
 
-이제 클래스 간에 상호 작용을 시작해 보겠다.
+이제 클래스 간에 상호 작용을 시작해 보겠다. 게임 시작할 때 주인공을 만든다.
+
+```js
+class Game {
+  constructor(name) {
+    ...
+    this.start(name); // 주인공 이름을 인자로 받음
+  }
+  start(name) {
+    $gameMenu.addEventListener('submit', this.onGameMenuInput);
+    $battleMenu.addEventListener('submit', this.onBattleMenuInput);
+    this.changeScreen('game');
+    this.hero = new Hero(this, name); // 주인공 클래스 생성
+  }
+  ...
+}
+```
+
+주인공이 `Game`클래스의 `hero`속성에 등록됐다. `hero`객체에서도 `this.game`을 통해 게임 객체에 접근할 수 있다.
+
+이제는 주인공을 생성하자마자 주인공의 체력, 공격력, 경험치 등이 화면에 표시돼야 한다. 이를 담당하는 `updateHeroStat`메서드를 `Game`클래스에 생성하고 `start`메뉴에서 호출합니다.
+
+```js
+class Game {
+  ...
+  start(name) {
+    $gameMenu.addEventListener('submit', this.onGameMenuInput);
+    $battleMenu.addEventListener('submit', this.onBattleMenuInput);
+    this.changeScreen('game');
+    this.hero = new Hero(this, name);
+    this.updateHeroStat();
+  }
+  ...
+  updateHeroStat() {
+    const { hero } = this;
+    if (hero === null) { // 주인공이 전사한 경우
+      $heroName.textContent = '';
+      $heroLevel.textContent = '';
+      $heroHp.textContent = '';
+      $heroXp.textContent = '';
+      $heroAtt.textContent = '';
+      return;
+    }
+    $heroName.textContent = hero.name;
+    $heroLevel.textContent = `${hero.lev}Lev`;
+    $heroHp.textContent = `HP: ${hero.hp}/${hero.maxHp}`;
+    $heroXp.textContent = `XP: ${hero.xp}/${15 * hero.lev}`;
+    $heroAtt.textContent = `ATT: ${hero.att}`;
+  }
+}
+```
+
+이제 주인공을 생성하고 화면에도 표시했으니 사용자로부터 메뉴 입력을 받으면 된다. 이제는 전투 화면에서 몬스터를 생성하고 몬스터 정보를 화면에 표시(updateMonsterStat)해야 한다. 추가로 몬스터가 나타났다는 메시지도 화면에 띄운다(showMessage).
+
+```js
+class Game {
+  ...
+  onGameMenuInput = (event) => {
+    event.preventDefault();
+    const input = event.target['menu-input'].value;
+    if (input === '1') { // 모험
+      this.changeScreen('battle');
+      const randomIndex = Math.floor(Math.random() * this.monsterList.length);
+      const randomMonster = this.monsterList[randomIndex];
+      this.monster = new Monster(
+        this,
+        randomMonster.name,
+        randomMonster.hp,
+        randomMonster.att,
+        randomMonster.xp,
+      );
+      this.updateMonsterStat();
+      this.showMessage(`몬스터와 마주쳤다. ${this.monster.name}인 것 같다!`);
+    } else if (input === '2') { // 휴식
+    } else if (input === '3') { // 종료
+    }
+  }
+  onBattleMenuInput = (event) => {...}
+  updateHeroStat() {...}
+  updateMonsterStat() {
+    const { monster } = this;
+    if (monster === null) {
+      $monsterName.textContent     = '';
+      $monsterHp.textContent = '';
+      $monsterAtt.textContent = '';
+      return;
+    }
+    $monsterName.textContent = monster.name;
+    $monsterHp.textContent = `HP: ${monster.hp}/${monster.maxHp}`;
+    $monsterAtt.textContent = `ATT: ${monster.att}`;
+  }
+  showMessage(text) {
+    $message.textContent = text;
+  }
+}
+```
+
+이번에는 `JSON.parse(JSON.stringify(객체))`를 사용하지 않았다. `monsterList`로부터 `name`, `maxHp`, `att`, `xp` 값을 꺼내, `game`객체(this)와 함께 `Monster`클래스에 넣어 주었다. 문자열이나 숫자 같은 값은 깊은 복사를 할 필요가 없다.
+
+![그림 10-7 몬스터를 마주친 상태](./images/10-7.png)
