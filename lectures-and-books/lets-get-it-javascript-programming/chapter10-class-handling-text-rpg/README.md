@@ -2,6 +2,26 @@
 
 이 장에서는 텍스트 RPG를 만들면서 클래스 문법을 배운다. 주인공과 몬스터, 보스, 레벨업도 하는 게임이다.
 
+- [10.1 순서도 그리기](#101-순서도-그리기)
+- [10.2 주인공과 몬스터 만들기](#102-주인공과-몬스터-만들기)
+  - [제로초의 조언](#제로초의-조언)
+  - [1분 퀴즈 1번 문제는](#1분-퀴즈-1번-문제는)
+- [10.3 서로 공격하기](#103-서로-공격하기)
+- [10.4 클래스로 재구성하기](#104-클래스로-재구성하기)
+  - [제로초의 조언](#제로초의-조언-1)
+  - [1분 퀴즈 2번 문제가](#1분-퀴즈-2번-문제가)
+- [10.5 전투 결과 구현하기](#105-전투-결과-구현하기)
+  - [1분 퀴즈 3번 문제](#1분-퀴즈-3번-문제)
+- [마무리 요약](#마무리-요약)
+  - [window](#window)
+  - [this](#this)
+  - [참조, 깊은 복사, 얕은 복사](#참조-깊은-복사-얕은-복사)
+  - [클래스](#클래스)
+  - [클래스 상속](#클래스-상속)
+- [Self Check 기타 기능 구현하기](#self-check-기타-기능-구현하기)
+  - [소스코드](#소스코드)
+  - [결과](#결과)
+
 ## 10.1 순서도 그리기
 
 게임에는 크게 두 가지 모드가 있다. 모험, 휴식, 종료 중에서 선택하는 일반 모드와 모험을 떠나 적을 만나면 전투를 벌이는 전투 모드이다. 전투 모드에서는 적을 공격하거나 체력을 회복하거나 도망간다.
@@ -776,3 +796,419 @@ class Game {
 이번에는 `JSON.parse(JSON.stringify(객체))`를 사용하지 않았다. `monsterList`로부터 `name`, `maxHp`, `att`, `xp` 값을 꺼내, `game`객체(this)와 함께 `Monster`클래스에 넣어 주었다. 문자열이나 숫자 같은 값은 깊은 복사를 할 필요가 없다.
 
 ![그림 10-7 몬스터를 마주친 상태](./images/10-7.png)
+
+마지막으로 전투 메뉴에서 1(공격)을 입력하면 몬스터를 공격하게 해보자.
+
+```js
+class Game {
+  ...
+  onBattleMenuInput = (event) => {
+    event.preventDefault();
+    const input = event.target['battle-input'].value;
+    if (input === '1') { // 공격
+      const { hero, monster } = this;
+      hero.attack(monster);
+      monster.attack(hero);
+      this.showMessage(`${hero.att}의 데미지를 주고, ${monster.att}의 데미지를 받았다.`);
+      this.updateHeroStat();
+      this.updateMonsterStat();
+    } else if (input === '2') { // 회복
+    } else if (input === '3') { // 도망
+    }
+  }
+  ...
+}
+```
+
+![그림 10-8 서로 공격을 주고 받는 모습](./images/10-8.png)
+
+클래스로 바꾸니 코드가 기능별로 묶여 있어 깔끔해 보인다. 그런데 코드의 순서와 실행 순서가 달라 헷갈리기도 한다. 기존에는 코드가 순서대로 짜여 있어서 코드의 순서를 따라가면 됐다. 하지만 이제는 어떤 객체가 생성되고, 객체들이 어떻게 상호 작용을 하는지 파악해야 코드를 이해할 수 있다. 객체 간의 관계만 명확하게 프로그래밍하면 그 뒤로는 객체들끼리 알아서 상호 작용한다.
+
+### 제로초의 조언
+
+이렇게 클래스를 활용하다 보면 무조건 클래스로 만드는 것이 좋은지 궁금할 겁니다. 모든 것을 클래스로 만드는 사람이 있지만, 클래스를 아예 사용하지 않고 프로그래밍하는 사람도 있습니다. 클래스 위주로 프로그래밍하는 것을 **객체 지향 프로그래밍**이라고 하고, 함수를 조합해 가며 프로그래밍하는 것을 **함수형 프로그래밍**이라고 합니다. 9장까지 만든 게임처럼 순서도 절차대로 프로그래밍하는 것은 **절차형 프로그래밍**이라고 하고요.
+
+자바스크립트에서는 이 세 가지 프로그래밍 방식으로 코딩할 수 있습니다. 어떤 것이 다른 것보다 더 낫다고 말하기는 어렵습니다. 개발자 개인의 취향 차이일 수 있어서 다양한 방식을 경험해 보고 자신과는 어떤 방식이 맞는지, 현재 프로젝트와는 어떤 방식이 맞는지 판단해 보는 것이 좋습니다.
+
+> 객체 지향, 함수형, 절차형 프로그래밍에 대한 자세한 내용은 아래 링크를 참고
+> <https://ko.wikipedia.org/wiki/%EA%B0%9D%EC%B2%B4_%EC%A7%80%ED%96%A5_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D>
+> <https://ko.wikipedia.org/wiki/%ED%95%A8%EC%88%98%ED%98%95_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D>
+> <https://ko.wikipedia.org/wiki/%EC%A0%88%EC%B0%A8%EC%A0%81_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D>
+
+### 1분 퀴즈 2번 문제가
+
+이 세상에 존재하는 것을 클래스로 만드는 연습을 하면 좋습니다. 사람을 컴퓨터 세상 속에 구현해 봅시다. 사람(Human) 클래스를 만들고, 생성자 메서드에서는 이름과 나이를 속성으로 입력받으세요. 또한, 자신의 이름과 나이를 콘솔에 출력하는 메서드도 두 개 만드세요.
+
+나의 풀이는 아래와 같다.
+
+```js
+class Human {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  consoleName() {
+    console.log(this.name);
+  }
+  consoleAge() {
+    console.log(this.age);
+  }
+}
+
+const human = new Human('trevor1107', '999');
+human.consoleName(); // trevor1107
+human.consoleAge(); // 999
+```
+
+## 10.5 전투 결과 구현하기
+
+공격을 누르면 서로 공격하게 했으니 둘 중 먼저 체력이 0이 되는 쪽이 나오면 승부가 가려진다. 주인공의 체력이 0이 되면 게임 오버이고, 몬스터의 체력 0이 되면 주인공은 경험치를 얻는다. 경험치가 주인공 `레벨 x 15`보다 높으면 주인공은 레벨업을 한다. 레벨업을 하면 주인공은 체력을 모두 회복하고 최대 체력과 공격력이 5씩 증가한다.
+
+```js
+class Game {
+  ...
+  onBattleMenuInput = (event) => {
+    event.preventDefault();
+    const input = event.target['battle-input'].value;
+    if (input === '1') { // 공격
+      const { hero, monster } = this;
+      hero.attack(monster);
+      monster.attack(hero);
+      if (hero.hp <= 0) { // 주인공 체력이 0이하, 게임 오버
+        this.showMessage(`${hero.lev} 레벨에서 전사. 새 주인공을 생성하세요.`);
+        this.quit();
+      } else if (monster.hp <= 0) { // 몬스터 체력 0이하, 경험치 획득
+        this.showMessage(`몬스터를 잡아 ${monster.xp} 경험치를 얻었다.`);
+        hero.getXp(monster.xp);
+        this.monster = null;
+        this.changeScreen('game');
+      } else {
+        this.showMessage(`${hero.att}의 데미지를 주고, ${monster.att}의 데미지를 받았다.`);
+      }
+      this.updateHeroStat();
+      this.updateMonsterStat();
+    } else if (input === '2') { // 회복
+    } else if (input === '3') { // 도망
+    }
+  }
+...
+  showMessage(text) {
+    $message.textContent = text;
+  }
+  quit() {
+    this.hero = null;
+    this.monster = null;
+    this.updateHeroStat();
+    this.updateMonsterStat();
+    $gameMenu.removeEventListener('submit', this.onGameMenuInput);
+    $battleMenu.removeEventListener('submit', this.onBattleMenuInput);
+    this.changeScreen('start');
+    game = null;
+  }
+}
+
+class Hero {
+  ...
+  heal(monster) {...}
+  getXp(xp) {
+    this.xp += xp;
+    if (this.xp >= this.lev * 15) { // 경험치를 다 채우면
+      this.xp -= this.lev * 15;
+      this.lev += 1;
+      this.maxHp += 5;
+      this.att += 5;
+      this.hp = this.maxHp;
+      this.game.showMessage(`레벨업! 레벨 ${this.lev}`);
+    }
+  }
+}
+```
+
+![그림 10-9 레벨업을 한 모습](./images/10-9.png)
+
+그런데 `Hero`클래스와 `Monster`클래스에 공통되는 이름, 체력, 공격력, 경험치 같은 속성이 있다. 그리고 `attack` 같은 공통 메서드가 있다. 이러한 중복을 제거하기 위해 클래스의 **상속**이라는 개념을 사용한다.
+
+공통되는 부분만 추려 새로운 클래스로 만들고 각각의 클래스는 이 클래스를 가져와 사용할 수 있는데, 이를 상속받는다고 한다.
+
+공통 클래스인 `Unit`을 만들어본다.
+
+```js
+class Unit {
+  constructor(game, name, hp, att, xp) {
+    this.game = game;
+    this.name = name;
+    this.maxHp = hp;
+    this.hp = hp;
+    this.att = att;
+    this.xp = xp;
+  }
+  attack(target) {
+    target.hp -= this.att;
+  }
+}
+```
+
+이제 다른 클래스에서 공통 클래스인 `Unit`을 `extends`예약어로 상속 받을 수 있다.
+
+```js
+class Hero extends Unit {
+  constructor(game, name) {
+    super(game, name, 100, 10, 0); // 부모 클래스의 생성자 호출
+    this.lev = 1; // 그 외 속성
+  }
+  attack(target) {
+    super.attack(target); // 부모 클래스의 attack
+    // 부모 클래스 attack 외의 동작
+  }
+  ...
+}
+
+class Monster extends Unit {
+  constructor(game, name, hp, att, xp) {
+    super(game, name, hp, att, xp);
+  }
+}
+```
+
+`super`함수는 부모 클래스(Unit)을 의미한다. `super()`는 부모 클래스의 `constructor`함수를 호출하는 것과 같다. 즉, 부모 클래스의 생성자에 인수를 전달한다. `Hero`의 `lev`속성은 부모 클래스에 존재하지 않는 속성이라서 `lev`속성은 `super`아래에 따로 적는다. 공통 속성을 super로 처리했다고 보면 된다.
+
+`Hero`의 `Attack`메서드에 보면 `super.attack`을 호출하는데, 이것은 부모 클래스의 `attack`메서드를 호출하는 것과 같다. `super.attack`을 호출하는 것은 필수가 아닌 선택이다.
+
+`Monster`처럼 `attack`메서드를 생성하지 않은 경우에 부모 클래스에 `attack`메서드가 존재한다면 부모 클래스의 `attack`메서드를 대신 호출한다. 따라서 `Hero`의 `attack`메서드 또한 부모 클래스의 `attack`메서드를 호출하는 것 외에는 다른 작업을 하지 않는다면 생략해도 된다.
+
+```js
+class A extends B {
+  method() {
+    super.method(); // 메서드 내에서 부모의 메서드만 호출하므로 생략 가능
+  }
+}
+
+// 아래 처럼 바꿔도 된다는 뜻이다.
+class A extends B {
+}
+
+const obj = new A();
+obj.method(); // super.method()를 호출 즉, B의 method()를 호출
+```
+
+### 1분 퀴즈 3번 문제
+
+1분 퀴즈 2에서 다음과 같이 Human 클래스를 만들었습니다.
+
+```js
+class Human {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  sayName() {
+    console.log(this.name);
+  }
+  sayAge() {
+    console.log(this.age);
+  }
+}
+```
+
+`Human`클래스를 상속하면 조금 더 구체적인 사람을 만들 수 있습니다. HTML, CSS, JS를 할 줄 아는 개발자를 만들어 봅시다.
+
+나의 풀이는 아래와 같다.
+
+```js
+class Human {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  sayName() {
+    console.log(this.name);
+  }
+  sayAge() {
+    console.log(this.age);
+  }
+}
+
+class WebProgrammer extends Human {
+  constructor(name, age, skills) {
+    super(name, age);
+    this.skills = skills;
+  }
+}
+
+const webProgrammer = new WebProgrammer('trevor1107', '999', ['HTML', 'CSS', 'JS']);
+
+console.log(webProgrammer.skills); // ['HTML', 'CSS', 'JS']
+```
+
+## 마무리 요약
+
+### window
+
+window 객체는 브라우저를 가리키는 객체로, 브라우저가 제공하는 기본 객체와 함수들은 대부분 window 객체 안에 들어 있습니다. document 객체나 console 객체도 실제로는 window.document, window.console인데, window를 생략하고 document와 console만 적습니다.
+
+### this
+
+this는 상황에 따라 다른 값을 가집니다. 기본적으로 this는 window 객체를 가리키므로 어떤 때에 어떤 값을 가지는지 외우면 됩니다.
+
+1. 객체를 통해 this를 사용할 때는 this가 해당 객체를 가리키게 됩니다.
+2. 특정 메서드는 콜백 함수의 this를 바꿉니다. addEventListener가 대표적입니다.
+3. this가 바뀌는 것을 원치 않는다면 함수 선언문 대신 화살표 함수를 사용합니다.
+
+### 참조, 깊은 복사, 얕은 복사
+
+복사는 어떤 값을 다른 변수에 대입할 때 기존 값과 참조 관계가 끊기는 것을 의미합니다. 객체가 아닌 값은 애초부터 참조 관계가 없으므로 그냥 복사됩니다.
+
+객체를 복사할 때는 얕은 복사와 깊은 복사가 있는데, 얕은 복사는 중첩된 객체가 있을 때 가장 바깥 객체만 복사되고 내부 객체는 참조 관계를 유지하는 복사를 의미합니다. 깊은 복사는 내부 객체까지 참조 관계가 끊겨서 복사되는 것을 의미합니다.
+
+```js
+const array = [{ j: 'k' }, { l: 'm' }];
+const reference = array; // 참조
+const shallowCopy = [...array]; // 얕은 복사
+const deepCopy = JSON.parse(JSON.stringify(array)); // 깊은 복사
+console.log(array === reference); // true
+console.log(array[0] === reference[0]); // true
+console.log(array === shallowCopy); // false
+console.log(array[0] === shallowCopy[0]); // true
+console.log(array === deepCopy); // false
+console.log(array[0] === deepCopy[0]); // false
+```
+
+JSON.parse(JSON.stringify(값))으로 간단하게 깊은 복사할 수 있습니다.
+
+얕은 복사를 할 때는 ... 연산자를 사용합니다. 배열이라면 [...배열]을 하면 되고, 객체라면 {...객체}를 하면 됩니다.
+
+### 클래스
+
+객체를 생성하는 템플릿 문법입니다. class 예약어로 클래스를 선언하고 constructor 메서드 안에 기존 코드를 넣습니다. new를 붙여 호출하면 constructor 함수가 실행되고 객체가 반환됩니다. this는 생성된 객체 자신을 가리키게 됩니다.
+
+### 클래스 상속
+
+클래스끼리 extends 예약어로 상속할 수 있습니다. 상속하는 클래스는 부모 클래스가 되고, 상속받는 클래스는 자식 클래스가 됩니다. 공통되는 속성이나 메서드는 부모 클래스로부터 상속받습니다.
+
+```js
+class Hero extends Unit {
+  constructor(game, name) {
+    super(game, name, 100, 10, 0); // 부모 클래스의 생성자 호출
+    this.lev = 1; // 그 외 속성
+  }
+  attack(target) {
+    super.attack(target); // 부모 클래스의 attack
+    // 자식 클래스만의 동작
+  }
+}
+```
+
+자식 클래스에서 super 함수는 부모 클래스를 의미하며 부모 클래스의 생성자에 인수를 전달합니다. 공통되는 속성은 부모 클래스의 것을 사용하고, 공통되지 않는 속성은 자식 클래스에 따로 선언합니다.
+
+메서드에서도 super를 사용할 수 있습니다. 자식 클래스에서 super.메서드를 호출하는 것은 부모 클래스의 메서드를 호출하는 것과 같습니다. 부모 클래스의 메서드를 호출한 후 다른 작업을 할 수 있습니다. 자식 클래스에 메서드를 생성하지 않은 경우에도 부모 클래스에 메서드가 존재한다면 호출할 수 있습니다.
+
+## Self Check 기타 기능 구현하기
+
+앞에서 구현한 내용을 참고해 나머지 기능을 구현해 봅시다. 일반 메뉴에서는 휴식과 종료 기능을, 전투 메뉴에서는 회복과 도망 기능을 구현하면 됩니다.
+
+휴식 기능은 주인공의 체력을 최대로 회복하는 기능입니다. 종료 기능은 게임을 종료하고 주인공을 새로 생성하는 화면으로 되돌립니다. 회복 기능은 전투 중에 체력을 20 회복하는 기능입니다. 다만, 회복 후에 몬스터에게 한 번 공격을 당합니다. 또한, 체력은 최대 체력(maxHp) 값을 넘을 수 없습니다. 예를 들어, 최대 체력이 80이고 현재 체력이 70이라면 체력을 20 회복해도 90이 되는 것이 아니라 80이 됩니다. 도망 기능은 강력한 몬스터를 만났을 때 도망가는 기능으로, 일반 메뉴로 되돌아가게 합니다.
+
+힌트: 회복 기능에는 Math.min 메서드를 사용하고, 종료 기능은 quit 메서드를 재사용하면 됩니다.
+
+### 소스코드
+
+기존 소스코드에서 달라지는 부분만 작성했다.
+
+```js
+class Game {
+  ...
+  onGameMenuInput = (event) => {
+    event.preventDefault();
+    const input = event.target['menu-input'].value;
+    const { hero } = this;
+    if (input === '1') { // 모험
+      this.changeScreen('battle');
+      const randomIndex = Math.floor(Math.random() * this.monsterList.length);
+      const randomMonster = this.monsterList[randomIndex];
+      this.monster = new Monster(
+        this,
+        randomMonster.name,
+        randomMonster.hp,
+        randomMonster.att,
+        randomMonster.xp,
+      );
+      this.updateMonsterStat();
+      this.showMessage(`몬스터와 마주쳤다. ${this.monster.name}인 것 같다!`);
+    } else if (input === '2') { // Self Check 휴식
+      hero.rest();
+      this.updateHeroStat();
+      this.showMessage(`휴식으로 모든 HP가 회복되었다.`);
+    } else if (input === '3') { // 종료
+      this.quit();
+    }
+  }
+  onBattleMenuInput = (event) => {
+    event.preventDefault();
+    const input = event.target['battle-input'].value;
+    const { hero, monster } = this;
+    if (input === '1') { // 공격
+      hero.attack(monster);
+      monster.attack(hero);
+      if (hero.hp <= 0) { // 주인공 체력이 0이하, 게임 오버
+        this.heroDie();
+      } else if (monster.hp <= 0) { // 몬스터 체력 0이하, 경험치 획득
+        this.monsterDie();
+      } else {
+        this.showMessage(`${hero.att}의 데미지를 주고, ${monster.att}의 데미지를 받았다.`);
+      }
+      this.updateHeroStat();
+      this.updateMonsterStat();
+    } else if (input === '2') { // Self Check 회복
+      hero.heal(this.monster);
+      if (hero.hp <= 0) { // 주인공 체력이 0이하, 게임 오버
+        this.heroDie();
+      } else {
+        this.showMessage(`${hero.healNum}의 HP를 회복, ${monster.att}의 데미지를 받았다.`);
+      }
+      this.updateHeroStat();
+    } else if (input === '3') { // 도망
+      this.monster = null;
+      this.updateMonsterStat();
+      this.showMessage(`도망에 성공했다!`);
+      this.changeScreen('game'); // Self Check 일반 메뉴로 돌아가기
+    }
+  }
+  heroDie() {
+    this.showMessage(`${this.hero.lev} 레벨에서 전사. 새 주인공을 생성하세요.`);
+    this.quit();
+  }
+  monsterDie() {
+    const { hero, monster } = this;
+    this.showMessage(`몬스터를 잡아 ${monster.xp} 경험치를 얻었다.`);
+    hero.getXp(monster.xp);
+    this.monster = null;
+    this.changeScreen('game');
+  }
+  updateHeroStat() { ... }
+  updateMonsterStat() { ... }
+  showMessage() { ... }
+  quit() { ... }
+}
+
+class Hero extends Unit{
+  constructor(game, name) {
+    super(game, name, 100, 10, 0); // 부모 클래스의 생성자 호출
+    this.lev = 1; // 그 외 속성
+    this.healNum = 20;
+  }
+  attack(target) { ... }
+  rest() { // Self Check 휴식
+    this.hp = this.maxHp;
+  }
+  heal(monster) { // 회복
+    // Self Check 최대 체력 제한
+    this.hp = Math.min(this.hp + this.healNum, this.maxHp);
+    this.hp -= monster.att;
+  }
+  getXp(xp) { ... }
+}
+```
+
+### 결과
+
+![Self Check 결과 화면](./images/self-check-result.gif)

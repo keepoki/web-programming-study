@@ -77,11 +77,11 @@
           $startScreen.style.display = 'block';
           $gameMenu.style.display = 'none';
           $battleMenu.style.display = 'none';
-        } else if (screen === 'game') {
+        } else if (screen === 'game') { // 일반 메뉴
           $startScreen.style.display = 'none';
           $gameMenu.style.display = 'block';
           $battleMenu.style.display = 'none';
-        } else if (screen === 'battle') {
+        } else if (screen === 'battle') { // 전투 메뉴
           $startScreen.style.display = 'none';
           $gameMenu.style.display = 'none';
           $battleMenu.style.display = 'block';
@@ -90,6 +90,7 @@
       onGameMenuInput = (event) => {
         event.preventDefault();
         const input = event.target['menu-input'].value;
+        const { hero } = this;
         if (input === '1') { // 모험
           this.changeScreen('battle');
           const randomIndex = Math.floor(Math.random() * this.monsterList.length);
@@ -103,33 +104,55 @@
           );
           this.updateMonsterStat();
           this.showMessage(`몬스터와 마주쳤다. ${this.monster.name}인 것 같다!`);
-        } else if (input === '2') { // 휴식
+        } else if (input === '2') { // Self Check 휴식
+          hero.rest();
+          this.updateHeroStat();
+          this.showMessage(`휴식으로 모든 HP가 회복되었다.`);
         } else if (input === '3') { // 종료
+          this.quit();
         }
       }
       onBattleMenuInput = (event) => {
         event.preventDefault();
         const input = event.target['battle-input'].value;
+        const { hero, monster } = this;
         if (input === '1') { // 공격
-          const { hero, monster } = this;
           hero.attack(monster);
           monster.attack(hero);
           if (hero.hp <= 0) { // 주인공 체력이 0이하, 게임 오버
-            this.showMessage(`${hero.lev} 레벨에서 전사. 새 주인공을 생성하세요.`);
-            this.quit();
+            this.heroDie();
           } else if (monster.hp <= 0) { // 몬스터 체력 0이하, 경험치 획득
-            this.showMessage(`몬스터를 잡아 ${monster.xp} 경험치를 얻었다.`);
-            hero.getXp(monster.xp);
-            this.monster = null;
-            this.changeScreen('game');
+            this.monsterDie();
           } else {
             this.showMessage(`${hero.att}의 데미지를 주고, ${monster.att}의 데미지를 받았다.`);
           }
           this.updateHeroStat();
           this.updateMonsterStat();
-        } else if (input === '2') { // 회복
+        } else if (input === '2') { // Self Check 회복
+          hero.heal(this.monster);
+          if (hero.hp <= 0) { // 주인공 체력이 0이하, 게임 오버
+            this.heroDie();
+          } else {
+            this.showMessage(`${hero.healNum}의 HP를 회복, ${monster.att}의 데미지를 받았다.`);
+          }
+          this.updateHeroStat();
         } else if (input === '3') { // 도망
+          this.monster = null;
+          this.updateMonsterStat();
+          this.showMessage(`도망에 성공했다!`);
+          this.changeScreen('game'); // Self Check 일반 메뉴로 돌아가기
         }
+      }
+      heroDie() {
+        this.showMessage(`${this.hero.lev} 레벨에서 전사. 새 주인공을 생성하세요.`);
+        this.quit();
+      }
+      monsterDie() {
+        const { hero, monster } = this;
+        this.showMessage(`몬스터를 잡아 ${monster.xp} 경험치를 얻었다.`);
+        hero.getXp(monster.xp);
+        this.monster = null;
+        this.changeScreen('game');
       }
       updateHeroStat() {
         const { hero } = this;
@@ -150,7 +173,7 @@
       updateMonsterStat() {
         const { monster } = this;
         if (monster === null) {
-          $monsterName.textContent     = '';
+          $monsterName.textContent = '';
           $monsterHp.textContent = '';
           $monsterAtt.textContent = '';
           return;
@@ -190,13 +213,18 @@
       constructor(game, name) {
         super(game, name, 100, 10, 0); // 부모 클래스의 생성자 호출
         this.lev = 1; // 그 외 속성
+        this.healNum = 20;
       }
       attack(target) {
         super.attack(target); // 부모 클래스의 attack
         // 부모 클래스 attack 외의 동작
       }
-      heal(monster) {
-        this.hp += 20;
+      rest() { // Self Check 휴식
+        this.hp = this.maxHp;
+      }
+      heal(monster) { // 회복
+        // Self Check 최대 체력 제한
+        this.hp = Math.min(this.hp + this.healNum, this.maxHp);
         this.hp -= monster.att;
       }
       getXp(xp) {
@@ -216,7 +244,6 @@
         super(game, name, hp, att, xp);
       }
     }
-    
 
     let game = null;
     $startScreen.addEventListener('submit', (event) => {
