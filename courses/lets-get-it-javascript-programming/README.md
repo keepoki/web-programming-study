@@ -40,3 +40,4 @@ Let's Get It 자바스크립트 프로그래밍 책 & 강의 학습에 대한 �
 8. [Date 사용하기_반응속도 테스트](./chapter08-use-date-test-response-rate)
 9. [이차원 배열 다루기_틱택토 게임](./chapter09-handling-two-dimensional-arrays-tictactoe-game)
 10. [클래스 다루기_텍스트 RPG](./chapter10-class-handling-text-rpg)
+11. [이벤트 루프 이해하기_카드 짝 맞추기 게임](./chapter11-understanding-event-loops-card-matching-game)
