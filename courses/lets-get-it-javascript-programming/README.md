@@ -41,3 +41,4 @@ Let's Get It 자바스크립트 프로그래밍 책 & 강의 학습에 대한 �
 9. [이차원 배열 다루기_틱택토 게임](./chapter09-handling-two-dimensional-arrays-tictactoe-game)
 10. [클래스 다루기_텍스트 RPG](./chapter10-class-handling-text-rpg)
 11. [이벤트 루프 이해하기_카드 짝 맞추기 게임](./chapter11-understanding-event-loops-card-matching-game)
+12. [재귀 함수 사용_지뢰 찾기 게임](./chapter12-using-recursive-functions-mine-hunting-game)
