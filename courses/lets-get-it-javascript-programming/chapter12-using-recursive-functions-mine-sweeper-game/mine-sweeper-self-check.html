@@ -50,17 +50,39 @@
       MINE: -6,
       OPENED: 0, // 0 이상이면 모두 열린 칸
     }
+    // 개인 도전 3. 물음표, 깃발, 지뢰, 폭발한 지뢰를 이모지로 변경
+    const CODE_TEXT = {
+      FLAG: '🚩',
+      MINE: '💣',
+      QUESTION: '❔',
+    }
     let data;
     let openCount = 0;
     let startTime;
     let interval;
+    let firstClick;
+    let mines; // 지뢰를 담을 배열
 
     function onSubmit(event) {
       event.preventDefault();
       row = parseInt(event.target.row.value);
       cell = parseInt(event.target.cell.value);
       mine = parseInt(event.target.mine.value);
+
+      // 개인 도전 1. 지뢰 개수에 대한 예외처리
+      if (row * cell <= mine) {
+        alert("지뢰의 개수는 '가로 * 세로'의 크기보다 클 수 없습니다.")
+        return;
+      }
+
+      // 개인 도전 2. 생성 문제 예외 처리
+      data = [];
+      mines = [];
+      $tbody.innerHTML = '';
+
       drawTable();
+      openCount = 0;
+      firstClick = true;
       startTime = new Date();
       interval = setInterval(() => {
         const time = Math.floor((new Date() - startTime) / 1000);
@@ -91,6 +113,7 @@
         const ver = Math.floor(shuffle[k] / cell);
         const hor = shuffle[k] % cell;
         data[ver][hor] = CODE.MINE;
+        mines.push({ rowIndex: ver, cellIndex: hor }); // 지뢰 배열에 추가
       }
       return data;
     }
@@ -128,7 +151,7 @@
         $tbody.removeEventListener('click', onLeftClick);
         setTimeout(() => {
           alert(`승리했습니다! ${time}초가 걸렸습니다.`);
-        }, 0);
+        }, 5);
       }
       return count;
     }
@@ -153,14 +176,62 @@
       const target = event.target; // td 태그겠죠?
       const rowIndex = target.parentNode.rowIndex;
       const cellIndex = target.cellIndex;
-      const cellData = data[rowIndex][cellIndex];
+      let cellData = data[rowIndex][cellIndex];
+      // Self Check 첫 번째로 클릭한 칸은 지뢰가 없게 만든다.
+      if (firstClick) {
+        firstClick = false;
+
+        // 지뢰를 클릭했는지 확인한다.
+        let isMine = false;
+        let targetMine = null;
+        for (const mine of mines) {
+          if (mine.rowIndex === rowIndex && mine.cellIndex === cellIndex) {
+            isMine = true;
+            targetMine = mine;
+            break;
+          }
+        }
+
+        // 지뢰를 클릭했다면 지뢰를 옮긴다.
+        if (isMine) {
+          const max = row * cell;
+          const normalData = [];
+          data.forEach((row, rowIndex) => {
+            row.forEach((cell, cellIndex) => {
+              if (cell === CODE.NORMAL) {
+                normalData.push({ rowIndex, cellIndex });
+              }
+            })
+          })
+          const randomIndex = Math.floor(Math.random() * normalData.length);
+          const normalRowIndex = normalData[randomIndex].rowIndex;
+          const normalCellIndex = normalData[randomIndex].cellIndex;
+          data[normalRowIndex][normalCellIndex] = CODE.MINE;
+          data[rowIndex][cellIndex] = CODE.NORMAL;
+          cellData = CODE.NORMAL;
+          targetMine.rowIndex = normalRowIndex;
+          targetMine.cellIndex = normalCellIndex;
+        }
+      }
+
       if (cellData === CODE.NORMAL) { // 닫힌 칸이면
         openAround(rowIndex, cellIndex); // 주변 칸도 연다
       } else if (cellData === CODE.MINE) { // 지뢰 칸이면
-        target.textContent = '펑';
+        // Self Check 지뢰 칸을 클릭하면 모든 지뢰 위치를 사용자에게 보여준다.
+        mines.forEach((mine) => {
+          $tbody.children[mine.rowIndex].children[mine.cellIndex].textContent = CODE_TEXT.MINE;
+        })
+
+        target.textContent = '💥';
         target.className = 'opened';
         $tbody.removeEventListener('contextmenu', onRightClick);
         $tbody.removeEventListener('click', onLeftClick);
+
+        // 개인 도전 4. 폭탄 클릭시 타이머가 멈추고 폭탄이 터졌다는 alert 표시
+        clearInterval(interval);
+        setTimeout(() => {
+          alert(`폭탄이 터졌습니다!`);
+        }, 5);
       } // 나머지는 무시
     }
 
@@ -174,11 +245,11 @@
       if (cellData === CODE.MINE) { // 지뢰면
         data[rowIndex][cellIndex] = CODE.QUESTION_MINE; // 물음표 지뢰로
         target.className = 'question';
-        target.textContent = '?';
+        target.textContent = CODE_TEXT.QUESTION;
       } else if (cellData === CODE.QUESTION_MINE) { // 물음표 지뢰면
         data[rowIndex][cellIndex] = CODE.FLAG_MINE; // 깃발 지뢰로
         target.className = 'flag';
-        target.textContent = '!';
+        target.textContent = CODE_TEXT.FLAG;
       } else if (cellData === CODE.FLAG_MINE) { // 깃발 지뢰면
         data[rowIndex][cellIndex] = CODE.MINE; // 지뢰로
         target.className = '';
@@ -186,11 +257,11 @@
       } else if (cellData === CODE.NORMAL) { // 닫힌 칸이면
         data[rowIndex][cellIndex] = CODE.QUESTION; // 물음표로
         target.className = 'question';
-        target.textContent = '?';
+        target.textContent = CODE_TEXT.QUESTION;
       } else if (cellData === CODE.QUESTION) { // 물음표면
         data[rowIndex][cellIndex] = CODE.FLAG; // 깃발으로
         target.className = 'flag';
-        target.textContent = '!';
+        target.textContent = CODE_TEXT.FLAG;
       } else if (cellData === CODE.FLAG) { // 깃발이면
         data[rowIndex][cellIndex] = CODE.NORMAL; // 닫힌 칸으로
         target.className = '';
