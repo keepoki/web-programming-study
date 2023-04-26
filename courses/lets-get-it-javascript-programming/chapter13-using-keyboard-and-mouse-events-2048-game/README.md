@@ -6,6 +6,19 @@
 
 <img src='./images/13-1.jpg' alt='그림 13-1 2048 게임' width='300px'/>
 
+- [13.1 순서도 그리기](#131-순서도-그리기)
+- [13.2 이동 방향 판단하기](#132-이동-방향-판단하기)
+- [13.3 숫자 합쳐 두 배로 만들기](#133-숫자-합쳐-두-배로-만들기)
+  - [제로초의 조언](#제로초의-조언)
+- [13.4 승리와 패배 구현하기](#134-승리와-패배-구현하기)
+- [마무리 요약](#마무리-요약)
+  - [documentFragment](#documentfragment)
+  - [키보드 이벤트](#키보드-이벤트)
+  - [마우스 이벤트](#마우스-이벤트)
+- [Self Check 되돌리기 기능 추가하기](#self-check-되돌리기-기능-추가하기)
+  - [소스코드](#소스코드)
+  - [결과](#결과)
+
 ## 13.1 순서도 그리기
 
 2048 게임의 순서도를 먼저 그려 보자. 처음에 4 × 4 표를 그리고 무작위 위치에 숫자 2를 둔 상태로 시작한다. 마우스 또는 키보드 이벤트가 발생하면 어느 방향으로 움직일지를 판단해서 해당 방향으로 숫자를 몰고, 몰았을 때 연이어 같은 숫자 두 개 있으면 하나로 합치면서 숫자를 두 배로 만든다.
@@ -178,7 +191,7 @@ window.addEventListener('keyup', (event) => {
 
 마우스 이벤트의 속성을 보면 x, y 좌표를 얻을 수 있는데, 좌표에는 여러 종류가 있다. x좌표로는 `clientX`, `offsetX`, `pageX`, `screenX`, `movementX`가 있고 y좌표에도 동일한 종류가 있다. 각 좌표가 의미하는 바를 알아야 정확하게 마우스의 위치 변화를 잡아낼 수 있다.
 
-`clientX`, `clientY`는 현재 브라우저 페이지 내에서의 x, y좌표를 가리킨다(픽셀 단위). `pageX`와 `pageY`도 브라우저 페이지 내에서의 x, y좌표를 가리키지만, 스크롤이 있으면 스크롤한 픽셀 값까지 포함한다는 점이 `clientX`, `clientY`와 다르다.
+`clientX`, `clientY`는 현재 브라우저 페이지 내에서의 x, y좌표를 가리킨다(픽셀 단위). `pageX`와 `pageY`도 브라우저 페이지 내에서의 x, y좌표를 가리키지만, 스크롤이 있으면 스크롤 한 픽셀 값까지 포함한다는 점이 `clientX`, `clientY`와 다르다.
 
 `offsetX`와 `offsetY`는 이벤트를 연결한 대상을 기준으로 마우스의 x, y좌표를 가져온다. 지금은 `window`에 이벤트를 걸어서 `clientX`, `clientY`와 동일하지만, 페이지 내의 다른 태그에 마우스 이벤트를 걸면 해당 태그의 왼쪽 모서리 좌표가 0이 된다. `screenX`와 `screenY`는 모니터를 기준으로 잡아서 모니터의 왼쪽 모서리가 0이 된다.
 
@@ -291,7 +304,7 @@ window.addEventListener('mouseup', (event) => {
 
       draw({
         startX:startCoord[0], startY:startCoord[1],
-        endX: endCoord[0], endY:endCoord[1]
+        endX: endCoord[0], endY:endCoord[1],
       })
 
       log = '';
@@ -315,7 +328,7 @@ window.addEventListener('mouseup', (event) => {
 
 ## 13.3 숫자 합쳐 두 배로 만들기
 
-방향을 알았으니 `moveCells`함수를 구현해보자. 먼저 각 칸을 해당 방향으로 정렬하고, 숫자가 겹치는 칸이 있는지 파악해서 있다면 합쳐야 한다. 상당히 복잡하므로 차분히 생각해야 구현할 수 있다.
+방향을 알았으니 `moveCells`함수를 구현해 보자. 먼저 각 칸을 해당 방향으로 정렬하고, 숫자가 겹치는 칸이 있는지 파악해서 있다면 합쳐야 한다. 상당히 복잡하므로 차분히 생각해야 구현할 수 있다.
 
 왼쪽 정렬부터 구현해 보자. 왼쪽 정렬을 구현하면 나머지 정렬은 방향만 바꾸면 된다. 숫자를 합치는 것은 아직 구현하지 말고 숫자를 왼쪽으로 정렬하는 것만 해 보자.
 
@@ -383,7 +396,7 @@ function moveCells(direction) {
       data.forEach((rowData, i) => {
         rowData.forEach((cellData, j) => {
           if (cellData) {
-            const currentRow = newData[i]
+            const currentRow = newData[i];
             const prevData = currentRow[currentRow.length - 1];
             if (prevData === cellData) { // 이전 값과 지금 값이 같으면
               currentRow[currentRow.length - 1] *= -2;
@@ -407,4 +420,364 @@ function moveCells(direction) {
 }
 ```
 
-코드에서 -2를 2로 바꾸고 왼족으로 몰아 보면 앞에서 언급한 문제가 발생한다.
+코드에서 -2를 2로 바꾸고 왼쪽으로 몰아 보면 앞에서 언급한 문제가 발생한다.
+
+### 제로초의 조언
+
+```js
+case 'left': {
+}
+```
+
+코드에서 `case`부분을 보면 중괄호(블록)가 생겼다. `case`를 작성할 때 중괄호가 꼭 필요한 것은 아니다. 다만, `case`내부에서 `let`이나 `const`를 사용할 때 중괄호를 넣어서 사용하는 것이 좋다. `const`나 `let`은 블록 스코프라서 블록 안에서만 접근할 수 있던 것을 기억하라.
+
+오른쪽 정렬은 왼쪽 정렬과 반대로 하면 된다. 왼쪽으로 정렬할 때 왼쪽에서부터 칸의 값을 검사했다면, 오른쪽으로 정렬할 때는 오른쪽부터 검사하면 된다.
+
+```js
+case 'right': {
+  const newData = [[], [], [], []];
+  data.forEach((rowData, i) => {
+    rowData.forEach((cellData, j) => {
+      if (rowData[3 - j]) {
+        const currentRow = newData[i];
+        const prevData = currentRow[currentRow.length - 1];
+        if (prevData === rowData[3 - j]) {
+          currentRow[currentRow.length - 1] *= -2;
+        } else {
+          newData[i].push(rowData[3 - j]);
+        }
+      }
+    });
+  });
+  console.log(newData);
+  [1, 2, 3, 4].forEach((rowData, i) => {
+    [1, 2, 3, 4].forEach((cellData, j) => {
+      data[i][3 - j] = Math.abs(newData[i][j]) || 0;
+    });
+  });
+  break;
+}
+```
+
+`cellData`를 `rowData[3 - j]`로 바꿨다. 따라서 오른쪽부터 3, 2, 1, 0번째 칸을 검사하게 된다.
+
+위로 정렬하는 것은 왼쪽 정렬과 비교하면 행과 열이 바뀐다. 즉 i와 j가 반대이다.
+
+```js
+case 'up': {
+  const newData = [[], [], [], []];
+  data.forEach((rowData, i) => {
+    rowData.forEach((cellData, j) => {
+      if (cellData) {
+        const currentRow = newData[j];
+        const prevData = currentRow[currentRow.length - 1];
+        if (prevData === cellData) {
+          currentRow[currentRow.length - 1] *= -2;
+        } else {
+          newData[j].push(cellData);
+        }
+      }
+    });
+  });
+  console.log(newData);
+  [1, 2, 3, 4].forEach((cellData, i) => {
+    [1, 2, 3, 4].forEach((rowData, j) => {
+      data[j][i] = Math.abs(newData[i][j]) || 0;
+    });
+  });
+  break;
+}
+```
+
+아래로 정렬하는 것은 위로 정렬하는 것과 반대이다.
+
+```js
+case 'down': {
+  const newData = [[], [], [], []];
+  data.forEach((rowData, i) => {
+    rowData.forEach((cellData, j) => {
+      if (data[3 - i][j]) {
+        const currentRow = newData[j];
+        const prevData = currentRow[currentRow.length - 1];
+        if (prevData === data[3 - i][j]) {
+          currentRow[currentRow.length - 1] *= -2;
+        } else {
+          newData[j].push(data[3 - i][j]);
+        }
+      }
+    });
+  });
+  console.log(newData);
+  [1, 2, 3, 4].forEach((cellData, i) => {
+    [1, 2, 3, 4].forEach((rowData, j) => {
+      data[3 - j][i] = Math.abs(newData[i][j]) || 0;
+    });
+  });
+  break;
+}
+```
+
+네 방향 정렬과 숫자 합치기를 모두 구현했다. i와 j 때문에 많이 헷갈린다. 머릿속으로 생각하기 어렵다면 노트를 꺼내서 배열을 그리고 순서대로 숫자를 대입해 보는 것도 좋은 방법이다.
+
+다음으로 `moveCells`함수의 마지막 부분에 `put2ToRandomCell`함수를 넣어 정렬 후 무작위 위치에 2를 생성하자. `draw`함수보다는 위에 있어야 화면에 새로 생성한 2가 그려진다.
+
+```js
+function moveCells(direction) {
+  ...
+  put2ToRandomCell();
+  draw();
+}
+```
+
+## 13.4 승리와 패배 구현하기
+
+순서도대로 2048을 만들면 승리하고, 16칸 모두에 숫자가 찼는데 합쳐질 숫자가 없어 새로운 2를 생성할 수 없다면 패배이다. 64까지 만들고 패배하는 것과 1024까지 만들고  패배하는 것을 똑같이 취급할 수는 없으므로 점수를 부여한다. 2를 두 개 합치면 4점, 16을 두 개 합치면 32점을 얻는 식이다. 패배할 때 지금까지 얻은 점수를 함께 표시한다.
+
+점수를 표시하기 전에 승패부터 가려보자.
+
+```js
+data = [
+  [32, 2, 4, 2],
+  [64, 4, 8, 4],
+  [2, 1024, 1024, 32],
+  [32, 16, 64, 4],
+];
+draw();
+
+function moveCells(direction) {
+  ... // switch 문
+  if (data.flat().includes(2048)) { // 승리
+    draw();
+    setTimeout(() => {
+      alert('축하합니다. 2048을 만들었습니다!');
+    }, 0);
+  } else if (!data.flat().includes(0)) { // 빈칸이 없으면 패배
+    alert('패배했습니다...');
+  } else {
+    put2ToRandomCell();
+    draw();
+  }
+}
+```
+
+실제로 2048을 만들기는 매우 어려우므로 항상 `data`에 더미 데이터를 넣어 테스트해 보는 것이 좋다. 왼쪽이나 오른쪽으로 이동하면 승리하고, 위나 아래로 이동하면 패배한다.
+
+<img src='./images/13-9.png' alt='그림 13-9 실행결과' width='650px'/>
+
+점수는 정렬할 때 계산하면 된다.
+
+```js
+function moveCells(direction) {
+  switch (direction) {
+    case 'left': {
+      const newData = [[], [], [], []];
+      data.forEach((rowData, i) => {
+        rowData.forEach((cellData, j) => {
+          if (cellData) {
+            const currentRow = newData[i];
+            const prevData = currentRow[currentRow.length - 1];
+            if (prevData === cellData) { // 이전 값과 지금 값이 같으면
+              // 점수 추가
+              const score = parseInt($score.textContent); 
+              $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+              currentRow[currentRow.length - 1] *= -2;
+            } else {
+              newData[i].push(cellData);
+            }
+          }
+        });
+      });
+      console.log(newData);
+      [1, 2, 3, 4].forEach((rowData, i) => {
+        [1, 2, 3, 4].forEach((cellData, j) => {
+          data[i][j] = Math.abs(newData[i][j]) || 0;
+        });
+      });
+      break;
+    }
+    // 나머지도 위와 같이 점수 추가하는 코드를 넣으면 된다.
+    case 'right': { ... }
+    case 'up': { ... }
+    case 'down': { ...}
+  }
+
+  if (data.flat().includes(2048)) { // 승리
+    draw();
+    setTimeout(() => {
+      alert('축하합니다. 2048을 만들었습니다!');
+    }, 0);
+  } else if (!data.flat().includes(0)) { // 빈칸이 없으면 패배
+    alert(`패배했습니다... ${$score.textContent}점`); // 점수 표시
+  } else {
+    put2ToRandomCell();
+    draw();
+  }
+}
+```
+
+패배했을 때도 점수가 표시된다. 게임을 완성하기 전에 더미 데이터를 없애는 것을 잊지 말자.
+
+<img src='./images/13-10.png' alt='그림 13-10 패배 시 점수가 표시되는 모습' width='400px'/>
+
+## 마무리 요약
+
+### documentFragment
+
+실무에서는 화면에 태그를 추가할 때 createElement로 만들어서 태그에 바로 추가(append)하는 방식을 잘 사용하지 않습니다. 그 대신 document.createDocumentFragment 메서드로 메모리 안에서만 존재하는 documentFragment를 만들고, documentFragment 안에 필요한 태그를 추가(append)한 뒤 마지막으로 $table에 한 번에 documentFragment를 추가하는 방식을 사용합니다.
+
+### 키보드 이벤트
+
+대표적인 키보드 이벤트에는 keydown과 keyup이 있습니다. 키보드를 누를 때와 눌렀다 뗄 때 각각 호출됩니다. 어떤 키를 눌렀는지는 event.key 속성에 나옵니다. 왼쪽은 ArrowLeft, 오른쪽은 ArrowRight, 위쪽은 ArrowUp, 아래쪽은 ArrowDown입니다. 이를 통해 방향을 확인할 수 있습니다. event.ctrlKey(Ctrl 키), event.altKey(Alt 키), event.shiftKey(Shift 키), event.metaKey(윈도우 키) 속성도 제공해 다른 키와 동시에 누르는 것도 알아낼 수 있습니다.
+
+### 마우스 이벤트
+
+대표적인 마우스 이벤트에는 mousedown, mouseup, mousemove가 있습니다. 각각 마우스를 클릭할 때 때와 클릭했다가 뗄 때, 마우스를 이동할 때 호출됩니다.
+
+마우스 이벤트의 속성에서 x, y 좌표를 얻을 수 있으며 이를 이용해 마우스 위치의 변화를 잡아낼 수 있습니다. 좌표에는 다음과 같은 종류가 있습니다.
+
+- clientX, clientY는 현재 브라우저 페이지 내에서의 x, y 좌표를 가리킵니다(픽셀 단위).
+- pageX와 pageY도 브라우저 페이지 내에서의 x, y 좌표를 가리키지만, 스크롤이 있는 경우 스크롤한 픽셀 값까지 포함합니다.
+- offsetX와 offsetY는 이벤트를 연결한 대상을 기준으로 마우스의 x, y 좌표를 가져옵니다.
+- screenX와 screenY는 모니터를 기준으로 모니터의 왼쪽 모서리가 0이 됩니다.
+- movementX와 movementY는 지난 mousemove 이벤트와 비교해 얼마나 마우스를 움직였는지 표시하므로 mousemove 이벤트인 경우에만 실제 값이 잡힙니다.
+
+## Self Check 되돌리기 기능 추가하기
+
+2048 게임은 움직이는 방향을 선택하는 것이 매우 중요합니다. 잘못 선택하면 패배로 이어집니다. 따라서 선택을 잘못했을 때 되돌릴 기회를 주고 싶습니다. 이 기능을 구현해 보세요.
+
+힌트: 과거 데이터를 저장해 두었다가 되돌리기를 누를 때 저장된 데이터로 복구하면 됩니다. 참고로 점수도 되돌려야 합니다.
+
+크게 추가할 것이 많이 없다.
+
+### 소스코드
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048</title>
+  <style>
+    ...
+    .btn-return {
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      color: white;
+      background-color: #5dbea3;
+    }
+    .btn-return:hover {
+      background-color: #9be9d3;
+    }
+  </style>
+</head>
+
+<body>
+  <table id="table"></table>
+  <p>
+    <span>점수: </span>
+    <span id="score">0</span>
+  </p>
+  <button class="btn-return">되돌리기</button>
+  <script>
+    const $table = document.getElementById('table');
+    const $score = document.getElementById('score');
+
+    let data = [];
+    let historyData = [];
+
+    function startGame() {
+      ...
+    }
+
+    function put2ToRandomCell() {
+      ...
+    }
+
+    function draw() {
+      ...
+    }
+
+    startGame();
+    draw();
+
+    function moveCells(direction) {
+      addHistory(data); // 이전 데이터 기록
+      switch (direction) {
+        case 'left': {
+          ...
+          break;
+        }
+        case 'right': {
+          ...
+          break;
+        }
+        case 'up': {
+          ...
+          break;
+        }
+        case 'down': {
+          ...
+          break;
+        }
+      }
+      ...
+    }
+
+    function updateScore(addScore) {
+      const score = parseInt($score.textContent);
+      const newScore = score + addScore;
+      $score.textContent = newScore;
+    }
+
+    function addHistory(data) {
+      if (!data || data.length < 1) return;
+      const newData = [];
+      data.forEach(rowData => {
+        newData.push([...rowData]);
+      })
+      const newStackData = {
+        score: parseInt($score.textContent),
+        data: newData,
+      }
+      historyData.push(newStackData);
+    }
+
+    window.addEventListener('keyup', (event) => {
+      ...
+    });
+    let startCoord;
+    window.addEventListener('mousedown', (event) => {
+      ...
+    });
+    window.addEventListener('mouseup', (event) => {
+      ...
+    });
+
+    // Self Check 되돌리기 기능 추가
+    document.querySelector('.btn-return').addEventListener('click', event => {
+      if (!historyData || historyData.length < 1) return;
+      // const prev = historyData.pop();
+      const prev = historyData.splice(historyData.length - 1, 1)[0];
+      data = prev.data;
+      $score.textContent = prev.score;
+      draw();
+    })
+  </script>
+</body>
+</html>
+```
+
+기존에서 버튼 관련 CSS 스타일이 추가되었고 점수를 표시하는 코드가 중복되어서 `updateScore`함수로 묶었다. 그리고 `addHistory`함수에서 데이터를 기록한다. 여기서 중요한 점은 깊은 복사이다. 저번에 배운 대로 `JSON.parse`함수와 `JSON.stringify`함수를 이용하면 더 간편하게 할 수 있다. 하지만 나는 조금 다른 방식의 깊은 복사로 해결하였다. 정해진 답은 없으니 본인에게 편하거나 효율적인 방식으로 도전해 보면 좋을 것 같다.
+
+기록하는 시점이 중요한데 `moveCells`함수에 진입하는 시점에서 데이터를 기록한다면 행동하기 이전 데이터를 기록하게 된다.
+
+그리고 버튼 클릭 이벤트 리스너 되돌리기 함수에서 배열의 `pop`또는 `splice`메서드를 이용해서 배열의 가장 마지막 데이터를 빼와서 데이터를 적용시켜주면 된다.
+
+### 결과
+
+<img src='./images/self-check-result.gif' alt='Self Check 결과 화면' width='400px'/>
+

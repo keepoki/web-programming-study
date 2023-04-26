@@ -23,16 +23,33 @@
     .color-512 { background-color: #edc950; color: #776e65;}
     .color-1024 { background-color: #edc53f; color: #776e65;}
     .color-2048 { background-color: #edc22e; color: #776e65;}
+    .btn-return {
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      color: white;
+      background-color: #5dbea3;
+    }
+    .btn-return:hover {
+      background-color: #9be9d3;
+    }
   </style>
 </head>
-  
+
 <body>
   <table id="table"></table>
-  <div id="score">0</div>
+  <p>
+    <span>점수: </span>
+    <span id="score">0</span>
+  </p>
+  <button class="btn-return">되돌리기</button>
   <script>
     const $table = document.getElementById('table');
     const $score = document.getElementById('score');
+
     let data = [];
+    let historyData = [];
 
     function startGame() {
       const $fragment = document.createDocumentFragment();
@@ -84,6 +101,7 @@
     draw();
 
     function moveCells(direction) {
+      addHistory(data); // 이전 데이터 기록
       switch (direction) {
         case 'left': {
           const newData = [[], [], [], []];
@@ -93,8 +111,7 @@
                 const currentRow = newData[i];
                 const prevData = currentRow[currentRow.length - 1];
                 if (prevData === cellData) { // 이전 값과 지금 값이 같으면
-                  const score = parseInt($score.textContent);
-                  $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                  updateScore(currentRow[currentRow.length - 1] * 2);
                   currentRow[currentRow.length - 1] *= -2;
                 } else {
                   newData[i].push(cellData);
@@ -102,7 +119,6 @@
               }
             });
           });
-          console.log(newData);
           [1, 2, 3, 4].forEach((rowData, i) => {
             [1, 2, 3, 4].forEach((cellData, j) => {
               data[i][j] = Math.abs(newData[i][j]) || 0;
@@ -118,8 +134,7 @@
                 const currentRow = newData[i];
                 const prevData = currentRow[currentRow.length - 1];
                 if (prevData === rowData[3 - j]) {
-                  const score = parseInt($score.textContent);
-                  $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                  updateScore(currentRow[currentRow.length - 1] * 2);
                   currentRow[currentRow.length - 1] *= -2;
                 } else {
                   newData[i].push(rowData[3 - j]);
@@ -127,7 +142,6 @@
               }
             });
           });
-          console.log(newData);
           [1, 2, 3, 4].forEach((rowData, i) => {
             [1, 2, 3, 4].forEach((cellData, j) => {
               data[i][3 - j] = Math.abs(newData[i][j]) || 0;
@@ -143,8 +157,7 @@
                 const currentRow = newData[j];
                 const prevData = currentRow[currentRow.length - 1];
                 if (prevData === cellData) {
-                  const score = parseInt($score.textContent);
-                  $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                  updateScore(currentRow[currentRow.length - 1] * 2);
                   currentRow[currentRow.length - 1] *= -2;
                 } else {
                   newData[j].push(cellData);
@@ -152,7 +165,6 @@
               }
             });
           });
-          console.log(newData);
           [1, 2, 3, 4].forEach((cellData, i) => {
             [1, 2, 3, 4].forEach((rowData, j) => {
               data[j][i] = Math.abs(newData[i][j]) || 0;
@@ -168,8 +180,7 @@
                 const currentRow = newData[j];
                 const prevData = currentRow[currentRow.length - 1];
                 if (prevData === data[3 - i][j]) {
-                  const score = parseInt($score.textContent);
-                  $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                  updateScore(currentRow[currentRow.length - 1] * 2);
                   currentRow[currentRow.length - 1] *= -2;
                 } else {
                   newData[j].push(data[3 - i][j]);
@@ -177,7 +188,6 @@
               }
             });
           });
-          console.log(newData);
           [1, 2, 3, 4].forEach((cellData, i) => {
             [1, 2, 3, 4].forEach((rowData, j) => {
               data[3 - j][i] = Math.abs(newData[i][j]) || 0;
@@ -197,6 +207,25 @@
         put2ToRandomCell();
         draw();
       }
+    }
+
+    function updateScore(addScore) {
+      const score = parseInt($score.textContent);
+      const newScore = score + addScore;
+      $score.textContent = newScore;
+    }
+
+    function addHistory(data) {
+      if (!data || data.length < 1) return;
+      const newData = [];
+      data.forEach(rowData => {
+        newData.push([...rowData]);
+      })
+      const newStackData = {
+        score: parseInt($score.textContent),
+        data: newData,
+      }
+      historyData.push(newStackData);
     }
 
     window.addEventListener('keyup', (event) => {
@@ -228,6 +257,16 @@
         moveCells('up');
       }
     });
+
+    // Self Check 되돌리기 기능 추가
+    document.querySelector('.btn-return').addEventListener('click', event => {
+      if (!historyData || historyData.length < 1) return;
+      // const prev = historyData.pop();
+      const prev = historyData.splice(historyData.length - 1, 1)[0];
+      data = prev.data;
+      $score.textContent = prev.score;
+      draw();
+    })
   </script>
 </body>
 </html>
