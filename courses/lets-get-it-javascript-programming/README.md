@@ -43,4 +43,4 @@ Let's Get It 자바스크립트 프로그래밍 책 & 강의 학습에 대한 �
 11. [이벤트 루프 이해하기_카드 짝 맞추기 게임](./chapter11-understanding-event-loops-card-matching-game)
 12. [재귀 함수 사용_지뢰 찾기 게임](./chapter12-using-recursive-functions-mine-hunting-game)
 13. [키보드 및 마우스 이벤트 사용하기_2048 게임](./chapter13-using-keyboard-and-mouse-events-2048-game)
-14. [복습_두더지 잡기 게임](./chapter14-revise-catch-mole-game)
+14. [복습_두더지 잡기 게임](./chapter14-revise-whack-a-mole-game)
