@@ -12,3 +12,23 @@
 이벤트 리스너와 타이머 등의 비동기 코드가 많이 나오므로 순서를 정확히 지키도록 호출 스택과 이벤트 루프를 생각하며 코딩해야 한다.
 
 HTML 파일을 만들어 다음 코드를 작성한다.
+
+```html
+```
+
+두더지 잡기도 언뜻 보면 3 X 3 표의 구조를 띄고 있다. `table`태그 대신해서 `div`태그를 사용했는데, `table` 태그는 원래 용도가 표를 나타내는 것이므로 다양한 화면을 표시하기에는 제약이 있다. 그래서 화면이 복잡해질수록 `div`태그로 구성하는 것이 좋다.
+
+두더지 잡기에서 애니메이션을 자바스크립트로 처리하면 복잡할 뿐만 아니라 성능도 좋지 않다. 코드가 조금 길어지겠지만, HTML과 CSS로 처리하는 것이 좋다. CSS 부분에서 `transition`이 애니메이션 역할을 한다.
+
+또한, 두더지 구멍을 CSS로 표현하려고 `cell`클래스 태그 안에 여러 겹의 `div`를 사용했다. HTML에서는 코드에서 아래에 위치한 태그가 화면상으로는 앞에 오게 된다. 따라서 코드에서는 `.hole`태그(구멍이미지, mole-hole.png)가 맨 앞에 있고, `.hole-front`태그(구멍 바깥쪽 이미지, mole-hole-front.png)가 맨 뒤에 위치한다.
+
+HTML과 CSS를 적절하게 사용하는 것이 좋다. 특히 화면의 배치와 애니메이션은 CSS를 적극적으로 사용하자.
+
+gopher.png, dead_gopher.png, bomb.png, explode.png, mole-hole.png, mole-hole-front.png
+6개의 이미지를 내려 받아야 한다. 주소는 <https://raw.githubusercontent.com/ZeroCho/es2021-webgame/master/파일명> 형태이다.
+
+예를 들어 gopher.png를 내려받으려면 <https://raw.githubusercontent.com/ZeroCho/es2021-webgame/master/gopher.png>로 접속하며 된다. 이미지를 마우스 우클릭한 후 이미지를 다른 이름으로 저장하면 된다. 이때 모든 이미지를 작성한 HTML 파일과 동일한 폴더에 저장해야 이미지가 제대로 보인다. 이미지가 안보인다면, 파일 경로를 잘 확인해야 한다.
+
+나 같은 경우 HTML 파일이 있는 폴더 하위에 `images`폴더를 생성하고 이미지 파일들을 넣어두고 HTML 파일에서 경로를 수정하였다.
+
+## 14.2 이미지 움직이기
