@@ -27,6 +27,128 @@
 HTML 파일을 만들어 다음 코드를 작성한다.
 
 ```html
+<html>
+<head>
+<meta charset="UTF-8">
+<title>두더지 잡기</title>
+<style>
+  .cell {
+    display: inline-block; position: relative;
+    width: 200px; height: 200px;
+    background: 'yellow'; overflow: hidden;
+  }
+  .gopher, .bomb {
+    width: 200px; height: 200px; bottom: 0;
+    position: absolute; transition: bottom 1s;
+  }
+  .gopher {
+    background: url('./gopher.png') center center no-repeat;
+    background-size: 200px 200px;
+  }
+  .dead {
+    background: url('./dead_gopher.png') center center no-repeat;
+    background-size: 200px 200px;
+  }
+  .bomb {
+    background: url('./bomb.png') center center no-repeat;
+    background-size: 200px 200px;
+  }
+  .boom {
+    background: url('./explode.png') center center no-repeat;
+    background-size: 200px 200px;
+  }
+  .hidden {
+    bottom: -200px;
+  }
+  .hole {
+    width: 200px; height: 150px; position: absolute; bottom: 0;
+    background: url('./mole-hole.png') center center no-repeat;
+    background-size: 200px 150px;
+  }
+  .hole-front {
+    width: 200px; height: 30px; position: absolute; bottom: 0;
+    background: url('./mole-hole-front.png') center center no-repeat;
+    background-size: 200px 30px;
+  }
+</style>
+</head>
+<body>
+<div>
+  <span id="timer">0</span>초&nbsp;
+  <span id="score">0</span>점
+  <button id="start">시작</button>
+</div>
+<div id="game">
+  <div class="row">
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+    </div>
+      <div class="row">
+      <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+    <div class="cell">
+      <div class="hole"></div>
+      <div class="gopher hidden"></div>
+      <div class="bomb hidden"></div>
+      <div class="hole-front"></div>
+    </div>
+  </div>
+</div>
+<script>
+  const $timer = document.querySelector('#timer');
+  const $score = document.querySelector('#score');
+  const $game = document.querySelector('#game');
+  const $start = document.querySelector('#start');
+  const $$cells = document.querySelectorAll('.cell');
+</script>
+</body>
+</html>
 ```
 
 두더지 잡기도 언뜻 보면 3 X 3 표의 구조를 띄고 있다. `table`태그 대신해서 `div`태그를 사용했는데, `table` 태그는 원래 용도가 표를 나타내는 것이므로 다양한 화면을 표시하기에는 제약이 있다. 그래서 화면이 복잡해질수록 `div`태그로 구성하는 것이 좋다.
@@ -316,7 +438,7 @@ alert 함수는 현재 진행되는 화면 변경 사항이나 애니메이션�
 
 힌트: 폭탄을 클릭할 때 목숨을 하나씩 깎으면 됩니다. 목숨이 0이 되면 기존처럼 게임 오버를 표시합니다.
 
-간단한 미션이다. 아래 소스코드에 바뀌는 부분만 표시했다.
+간단한 미션이다. 아래 소스코드에 바뀌는 부분만 표시했다. 그리고 시작 후에 처음 두더지를 클릭할 때 지연되어 끊기는 렉이 발생한다. 두더지 이미지 사이즈가 크기 때문에 발생한 문제로 보인다. 그래서 이미지 사이즈를 5000x5000에서 1024x1024로 조절하고 다시 테스트해보니 렉이 사라졌다. css를 이용해서 이미지 사이즈를 줄이더라도 원본 이미지의 픽셀의 계산을 무시하지 못하는 것 같다.
 
 ### 소스코드
 
