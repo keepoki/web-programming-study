@@ -2,4 +2,4 @@
 
 ## HTML 요소(element, tag)
 
-- [`<dialog>`](/html/elements/dialog)
+- [`<dialog>`](elements/dialog.md)
