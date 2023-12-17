@@ -71,4 +71,4 @@ dialog의 바깥 부분인 backdrop 범위를 클릭하면 닫히게 하는 이�
 
 ## 브라우저 호환성
 
-![브라우저 호환성 이미지](images/browser-compatibility.png)
+![브라우저 호환성 이미지](images/dialog-browser-compatibility.png)
