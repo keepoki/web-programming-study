@@ -1,0 +1,37 @@
+Landing page for the product/service below. The landing page should act to sell my product/service. Use the section design guide below. The site should be bold and stunning. The site should include full-screen images.
+
+
+[Details of the product/service]
+- my product/service name : 
+- brief description : 
+- what makes my product/service different : 
+- the vibe of this site :
+
+[Sections design guide]
+
+1. Hero section
+- Include the product/service name
+- Write a main slogan short, impactful, and iconic within 10 words.
+- Add a sub title within 15 words or less.
+- Insert impressive huge image.
+
+2. Features section
+- Write about differentiation of my product/service.
+- Insert beautiful images or cool visual elements.
+
+3. Testimonials section
+- Write fictional customer testimonials that align with site contents and tone.
+
+4. Gallery section
+- Insert more than 4 images that represent my product/service.
+- Showcase happy customers using your product/service, close-up shots of specific products/services, etc
+
+5. CTA section
+- Write an eye-catching and memorable call to action.
+
+6. FAQ section
+- List at least 4 questions that customers might ask about this product/service.
+
+7. Footer section
+
+Write slogan, tagline, text description, all texts in Korean.
