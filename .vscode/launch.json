@@ -30,6 +30,23 @@
       "outFiles": [
         "${workspaceFolder}/typescript/out/**/*.js",
       ]
+    },
+    {
+      "name": "Launch node",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/www",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+    },
+    {
+      "name": "Attach node",
+      "type": "node",
+      "request": "attach",
+      "processId": "${command:PickProcess}",
+      "restart": true,
+      "internalConsoleOptions": "neverOpen",
     }
   ]
 }
