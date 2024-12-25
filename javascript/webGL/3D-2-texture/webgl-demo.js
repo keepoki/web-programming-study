@@ -1,0 +1,218 @@
+import './type.d.js';
+import { initBuffers } from './init-buffers.js';
+import { drawScene } from './draw-scene.js';
+
+window.addEventListener('load', () => {
+  main();
+});
+
+function main() {
+  /** @type {HTMLCanvasElement | null} */
+  const canvas = document.getElementById('glcanvas');
+  /** @type {WebGL2RenderingContext | null} */
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl)  {
+    console.error('WebGL 초기화 실패, 브라우저 또는 컴퓨터에서 지원하지 않을 수 있습니다.') 
+    return;
+  }
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  // 검정, 불투명으로 설정
+  gl.clearColor(0.0, 0.0, 0.0, 1.0); 
+  // 색상과 깊이 버퍼를 지움
+  gl.clear(gl.COLOR_BUFFER_BIT); 
+
+  const vsSource = `
+    attribute vec4 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying highp vec2 vTextureCoord;
+
+    void main() {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      vTextureCoord = aTextureCoord;
+    }
+  `;
+
+  const fsSource = `
+    varying highp vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+
+    void main() {
+      gl_FragColor = texture2D(uSampler, vTextureCoord);
+    }
+  `
+
+  // 쉐이더 프로그램을 초기화, 꼭짓점 등을 설정하고 여기서 모든 조명이 켜집니다.
+  const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+
+  /**
+   * @type {ShaderProgramInfo}
+   * 쉐이더 프로그램을 사용하는 데 필요한 모든 정보를 수집합니다
+   */
+  const programInfo = {
+    program: shaderProgram,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+      textureCoord: gl.getAttribLocation(shaderProgram, 'aTextureCoord'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
+    },
+  };
+
+  // 우리가 그릴 개체들에 대한 모든 것을 구축합니다.
+  const buffers = initBuffers(gl);
+  const texture = loadTexture(gl, 'cube.png');
+  // const texture = loadTexture(gl, 'non-power-2-cube.png');
+  // 이미지 픽셀을 WebGL이 예상하는 아래에서 위 순서로 뒤집습니다.
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+  let cubeRotation = 0.0;
+  let deltaTime = 0;
+  let then = 0;
+
+  function render(now) {
+    now *= 0.001;
+    deltaTime = now - then;
+    then = now;
+
+    drawScene(gl, programInfo, buffers, texture, cubeRotation);
+    cubeRotation += deltaTime;
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+/**
+ * 쉐이더 프로그램을 초기화하여 WebGL이 데이터를 그리는 방법을 알 수 있도록 합니다
+ * @param {WebGL2RenderingContext} gl 
+ * @param {string} vsSource 
+ * @param {string} fsSource
+ * @returns {WebGLProgram | null}
+ */
+function initShaderProgram(gl, vsSource, fsSource) {
+  const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+  // 쉐이더 프로그램 생성
+  const shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  gl.linkProgram(shaderProgram);
+
+  // 쉐이더 프로그램 초기화 성공 유무 확인
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    console.error(`쉐이더 프로그램 초기화 실패: ${gl.getProgramInfoLog(shaderProgram)}`);
+    return null;
+  }
+
+  return shaderProgram;
+}
+
+/**
+ * 지정된 유형의 쉐이더를 만들고 소스를 업로드하고 컴파일 합니다
+ * @param {WebGL2RenderingContext} gl 
+ * @param {GLenum} type 
+ * @param {string} source
+ * @returns {WebGLShader | null}
+ */
+function loadShader(gl, type, source) {
+  const shader = gl.createShader(type);
+
+  // 쉐이더 객체에 소스를 보냄
+  gl.shaderSource(shader, source);
+
+  // 쉐이더 프로그램을 컴파일
+  gl.compileShader(shader);
+
+  // 컴파일 성공 유무 확인
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error(`쉐이더 컴파일 에러: ${gl.getShaderInfoLog(shader)}`);
+    gl.deleteShader(shader);
+    return null;
+  }
+
+  return shader;
+}
+
+/**
+ * 텍스처를 초기화하고 이미지를 로드합니다.
+ * 이미지 로드가 완료되면 텍스처에 복사합니다.
+ * @param {WebGL2RenderingContext} gl 
+ * @param {string} url 
+ * @returns {WebGLTexture}
+ */
+function loadTexture(gl, url) {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // 이미지는 인터넷을 통해 다운로드해야 하기 때문에
+  // 준비될 때 까지 잠시 시간이 걸릴 수 있습니다.
+  // 그때까지 질감에 하나의 픽셀을 넣어 바로 사용할 수 있습니다.
+  // 이미지 다운로드가 완료되면 이미지의 내용으로 텍스처를 갱신합니다.
+  const level = 0;
+  const internalFormat = gl.RGBA;
+  const width = 1;
+  const height = 1;
+  const border = 0;
+  const srcFormat = gl.RGBA;
+  const srcType = gl.UNSIGNED_BYTE;
+  const pixel = new Uint8Array([0, 0, 255, 255]); // 불투명한 파란색
+
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    level,
+    internalFormat,
+    width,
+    height,
+    border,
+    srcFormat,
+    srcType,
+    pixel,
+  );
+    
+  const image = new Image();
+  image.onload = () => {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      level,
+      internalFormat,
+      srcFormat,
+      srcType,
+      image,
+    );
+
+    // WebGL1은 필터링이 가장 가까운 또는 선형으로 설정된 2의 거듭제곱이 
+    // 아닌 텍스처만 사용할 수 있으며 밉맵을 생성할 수 없습니다. 
+    // 해당 텍스처의 래핑 모드도 CLAMP_TO_EDGE로 설정해야 합니다. 
+    // 반면에 텍스처가 두 차원 모두에서 2의 거듭제곱인 경우 WebGL은 
+    // 더 높은 품질의 필터링을 수행할 수 있고, 밉맵을 사용할 수 있으며, 
+    // 래핑 모드를 REPEAT 또는 MIRRORED_REPEAT로 설정할 수 있습니다.
+    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+      gl.generateMipmap(gl.TEXTURE_2D);
+    } else {
+      // 밉매핑과 UV 반복은 texParameteri()로 비활성화할 수 있습니다.
+      // 2의 거듭 제곱이 아닌 경우 밉맵을 비활성화하고 래핑을 가장자리에 clamp로 설정합니다.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
+  };
+  image.src = url;
+
+  return texture;
+}
+
+function isPowerOf2(value) {
+  return (value & (value - 1)) === 0;
+}
