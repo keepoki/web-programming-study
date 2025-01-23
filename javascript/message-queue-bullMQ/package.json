@@ -1,0 +1,24 @@
+{
+  "name": "message-queue-bullmq",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "worker": "node worker.js",
+    "nodemon": "nodemon --inspect ./bin/www",
+    "nodemon_worker": "nodemon --inspect worker.js"
+  },
+  "dependencies": {
+    "@bull-board/express": "^6.2.4",
+    "bullmq": "^5.21.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "^3.1.10",
+    "express": "~4.16.1",
+    "express-fileupload": "^1.5.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1",
+    "sharp": "^0.33.5"
+  }
+}
