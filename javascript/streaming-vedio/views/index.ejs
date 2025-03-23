@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="javascripts/main.js"></script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <video controls autoplay id="stream">
+    </video>
+    <div class="block"></div>
+    <div class="flex-box">
+      <select name="VideoList" id="video-list">
+        <option value="placeholder">Select a video</option>
+      </select>
+      <button onclick="handleClickVideoStream()" class="load-btn">streaming</button>
+      <button onclick="handleClickNotControlStream()" class="load-btn">Not control streaming</button>
+    </div>
+  </body>
+</html>

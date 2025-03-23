@@ -1,0 +1,48 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.block {
+  height: 10px;
+}
+
+#stream {
+  width: 720px;
+  height: 480px;
+  border: 1px solid;
+}
+
+#video-list {
+  width: 720px;
+  height: 30px;
+  padding-left: 5px;
+  border-radius: 5px;
+  color: white;
+  background-color: black;
+}
+
+.load-btn {
+  width: 160px;
+  height: 30px;
+  color: white;
+  background-color: black;
+  border: none;
+  border-radius: 5px;
+}
+
+.load-btn:hover {
+  background-color: gray;
+  cursor: pointer;
+}
+
+.flex-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+}
