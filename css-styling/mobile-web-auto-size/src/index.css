@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+html {
+  font-size: 62.5%;
+
+  /* 최대 너비 */
+  --lobby__max-width: 375px;
+  /* 기준 rem 값 */
+  --lobby__rem-unit: 10px;
+}
+
+/* 화면 너비가 375px 이하일 때 폰트 크기 조절 */
+@media screen and (max-width: 375px) {
+  html {
+    font-size: calc(10 * (100vw / 375)) !important;
+  }
+}
+
+body {
+  min-height: 100vh;
+  font-size: 1rem;
+  background-color: rgba(34, 119, 230, 0.7);
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
