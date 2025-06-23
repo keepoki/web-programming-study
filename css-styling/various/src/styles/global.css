@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('../assets/fonts/Alibaba-PuHuiTi-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('../assets/fonts/Alibaba-PuHuiTi-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('../assets/fonts/Alibaba-PuHuiTi-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('../assets/fonts/Alibaba-PuHuiTi-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('../assets/fonts/Alibaba-PuHuiTi-Heavy.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+} */
+
+/* @font-face {
+  font-family: 'REEJI-CHAO-XiaoShiT';
+  src: url('/fonts/REEJI-CHAO-XiaoShiT.ttf') format('truetype');
+  font-style: normal;
+} */
+
+
+:root {
+  font-family: 'Nanum Gothic', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* scrollbar-width: none; */
+  scrollbar-width: 4px;
+  /* font-size: 62.5%; */
+}
+
+
+/* 스크롤바 전체 */
+::-webkit-scrollbar {
+  /* display: none; */
+  width: 4px;
+  height: 4px;
+  background-clip: content-box;
+  border: 4px solid transparent;
+}
+
+/* 스크롤바의 트랙 */
+::-webkit-scrollbar-track {
+  background: #f2f2f2;
+  border-radius: 2px;
+}
+
+/* 스크롤바의 핸들 */
+::-webkit-scrollbar-thumb {
+  background: #c4c4c4;
+  border-radius: 2px;
+}
+
+/* 핸들에 마우스를 올렸을 때 */
+::-webkit-scrollbar-thumb:hover {
+  background: #949494;
+  /* 핸들의 배경색 (hover 시) */
+}
