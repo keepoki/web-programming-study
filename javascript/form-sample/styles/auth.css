@@ -1,0 +1,109 @@
+/* styles/auth.css */
+
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--background-color);
+    padding: 1.5rem;
+}
+
+.auth-container {
+    background-color: var(--card-background-color);
+    padding: 2.5rem; /* 패딩 증가 */
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    width: 100%;
+    max-width: 450px; /* 최대 너비 증가 */
+    text-align: center;
+}
+
+.auth-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 2rem; /* 간격 증가 */
+    font-size: 2.25rem; /* 글자 크기 증가 */
+    font-weight: 700;
+}
+
+.input-group {
+    margin-bottom: 1.5rem; /* 간격 증가 */
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.input-group input[type="email"],
+.input-group input[type="text"],
+.input-group input[type="password"] {
+    width: 100%; /* 100%로 설정하여 box-sizing에 맡김 */
+    padding: 0.75rem 1rem; /* 패딩 재조정 */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    color: var(--text-color);
+    background-color: var(--input-background-color);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.input-group input[type="email"]:focus,
+.input-group input[type="text"]:focus,
+.input-group input[type="password"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25); /* focus 시 그림자 */
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.875rem; /* 글자 크기 */
+    margin-top: 0.5rem;
+    display: none;
+    text-align: left;
+}
+
+.auth-button {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    background-color: var(--primary-color);
+    color: var(--button-text-color);
+    border-radius: var(--border-radius);
+    font-size: 1.125rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+    margin-top: 1.5rem;
+}
+
+.auth-button:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-1px);
+}
+
+.auth-button:active {
+    background-color: var(--primary-active-color);
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.auth-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.auth-link {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    color: var(--light-text-color);
+}
+
+.auth-link a {
+    font-weight: 600;
+}

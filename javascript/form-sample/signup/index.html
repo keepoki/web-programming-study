@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입</title>
+  <link rel="stylesheet" href="../styles/global.css">
+  <link rel="stylesheet" href="../styles/auth.css">
+  <link rel="stylesheet" href="../styles/modal.css">
+  <link rel="stylesheet" href="../styles/toast.css">
+</head>
+
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-container">
+      <h2>회원가입</h2>
+      <form id="registerForm">
+        <div class="input-group">
+          <label for="regEmail">아이디 (이메일)</label>
+          <input type="email" id="regEmail" name="email" placeholder="이메일을 입력하세요" autocomplete="email">
+          <p class="error-message" id="regEmailError"></p>
+        </div>
+        <div class="input-group">
+          <label for="nickname">닉네임</label>
+          <input type="text" id="nickname" name="nickname" placeholder="닉네임을 입력하세요" autocomplete="nickname">
+          <p class="error-message" id="nicknameError"></p>
+        </div>
+        <div class="input-group">
+          <label for="regPassword">비밀번호</label>
+          <input type="password" id="regPassword" name="password" placeholder="비밀번호 (8자 이상)"
+            autocomplete="new-password">
+          <p class="error-message" id="regPasswordError"></p>
+        </div>
+        <div class="input-group">
+          <label for="regPasswordConfirm">비밀번호 확인</label>
+          <input type="password" id="regPasswordConfirm" name="passwordConfirm" placeholder="비밀번호를 다시 입력하세요"
+            autocomplete="new-password">
+          <p class="error-message" id="regPasswordConfirmError"></p>
+        </div>
+        <button type="submit" id="registerButton" class="auth-button" disabled>회원가입</button>
+      </form>
+      <p class="auth-link">이미 계정이 있으신가요? <a href="/signin">로그인</a></p>
+    </div>
+  </div>
+  <script type="module" src="../js/signup.js"></script>
+</body>
+
+</html>

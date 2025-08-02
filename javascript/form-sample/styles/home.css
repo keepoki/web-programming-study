@@ -1,0 +1,47 @@
+/* styles/home.css */
+
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    background-color: var(--background-color);
+    padding: 1.5rem;
+}
+
+.welcome-container h1 {
+    font-size: 3.5rem; /* 글자 크기 증가 */
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.welcome-container p {
+    font-size: 1.25rem; /* 글자 크기 증가 */
+    color: var(--text-color);
+    margin-bottom: 2.5rem; /* 버튼과의 간격 조정 */
+}
+
+/* 로그아웃 버튼 스타일 */
+.logout-button {
+    padding: 0.875rem 1.75rem; /* 패딩 조정 */
+    font-size: 1.125rem; /* 글자 크기 증가 */
+    color: var(--button-text-color);
+    background-color: var(--secondary-color); /* 보조 색상 사용 */
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow); /* global.css 변수 사용 */
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.logout-button:hover {
+    background-color: var(--secondary-hover-color);
+    transform: translateY(-1px);
+}
+
+.logout-button:active {
+    background-color: var(--secondary-active-color);
+    transform: translateY(0);
+    box-shadow: none;
+}
